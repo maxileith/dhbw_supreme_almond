@@ -30,6 +30,10 @@ ORG 00h
 
 ORG 1000h
 
+; input:  None
+; use:    None
+; output: None
+; perma:  None
 init:			; start of program
 	; SMOD = 1
 	; PCON --> 10000000b
@@ -48,8 +52,7 @@ init:			; start of program
 	MOV S0RELH, #03h
 	MOV S0RELL, #0E6h
 	
-	; LJMP calcDeltaC
-	
+lol:
 	MOV R7, #11010110
 
 
@@ -57,6 +60,7 @@ init:			; start of program
 ; use:    A = bitwise AND
 ;         R7 = everything else
 ; output: R7 = char
+; perma:  None
 calcChar:
 	CJNE R7, #NMax, calcCharMod8 ; Jump to calcCharMod8 if n != NMax
 	MOV R7, #32d ; if n = NMax -> char = ' '
@@ -98,8 +102,10 @@ calcCharMod8eq7:
 
 
 ; input:  R7 = char
-; use:    None
+; use:    A = check TI and save column number
+;         DPTR = column counter address
 ; output: None
+; perma:  500
 output:
 	; output of R7 via COM 0
 	MOV S0BUF, R7
@@ -107,8 +113,21 @@ output_wait:
 	; check if sent
 	MOV A, S0CON
 	JNB ACC.1, output_wait
+output_reset:
 	ANL S0CON, #0FDh
+output_counter_operations:
+	; increase column counter
+	MOV DPTR, #500
+	MOVX A, @DPTR
+	INC A
+	MOVX @DPTR, A
+	; check if end of row is reached
+	CJNE A, #PX, lol
+	MOV A, #255
+	MOVX @DPTR, A
+	MOV R7, #10d ; new line
 	LJMP output
+	
 	
 
 	
@@ -137,6 +156,7 @@ calcDeltaC:
 	mov R0, MD0
 	mov R1, MD1
 	; Nun befindet sich Delta c in R0 und R1
+	
 	
 ; input:  Zn in R0 = ZnReL
 ;         R1 = ZnReH
