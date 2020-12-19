@@ -5,6 +5,7 @@ $NOMOD51
 ; R0 - Delta c Low-Byte
 ; R1 - Delta c High-Byte
 ; R7 - Auszugebendes Zeichen
+
 pointAReH EQU #111101$01b
 pointAReL EQU #00000000b
 	
@@ -21,14 +22,11 @@ PX EQU #20
 NMax EQU #20
 	
 ORG 00h
-	JMP init	; Sprung zum Programmanfang 
+	JMP init	; jump to start of program
 	
-ORG 23h
-	JMP maxiMachtDas
-
 ORG 1000h
-	
-init:			; Programmbeginn
+
+init:			; start of program
 	; SMOD = 1
 	; PCON --> 10000000b
 	; doubles the baud rate
@@ -37,7 +35,7 @@ init:			; Programmbeginn
 	; COM1
 	; SM0 = 0
 	; SM1 = 1
-	; S0CON --> 01000000b f�r Mode 1
+	; S0CON --> 01000000b for Mode 1
 	MOV S0CON, #01000000b ;
 	; BD (Baudrate generator enabled) = 1
 	; ADCON0 --> 10000000b
@@ -46,22 +44,24 @@ init:			; Programmbeginn
 	MOV S0RELH, #03h
 	MOV S0RELL, #0E6h
 	
-	MOV A, #10010000b ; Serial Port 0 Interrupt erlauben
-	MOV 0A8h, A
+	; MOV A, #10010000b ; allow serial interrupt 0
+	; MOV 0A8h, A
 	
+	MOV R7, #164d
+
+; serial output
 output:
+	; output of R7 via COM 0
+	MOV S0BUF, R7
+output_wait:
+	; check if sent
+	MOV A, S0CON
+	JNB ACC.1, output_wait
+	ANL S0CON, #0FDh
+	LJMP calc
 	
-
-
-
-
-
-
-
-
-
-
-berechneDeltaC:
+; calc delta C
+calcDeltaC:
 	mov A, pointBReL
 	subb A, pointAReL
 	mov R0, A
@@ -86,7 +86,19 @@ berechneDeltaC:
 	mov R1, MD1
 	; Nun befindet sich Delta c in R0 und R1
 	
+	
+
+
+
+
+
+
 checkZnQuadrat:
 	
+
+
+
+
+
 
 end
