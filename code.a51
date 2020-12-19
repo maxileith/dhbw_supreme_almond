@@ -2,23 +2,25 @@ $NOMOD51
 #include <Reg517a.inc>
 
 ; Zuordnung:
-; R0 - Delta c Low-Byte
-; R1 - Delta c High-Byte
+; R0 - ZnRe Low-Byte
+; R1 - ZnRe High-Byte
+; R2 - ZnIm Low-Byte
+; R3 - ZnIm High-Byte
 ; R7 - Auszugebendes Zeichen
-pointAReH EQU #111101$01b
-pointAReL EQU #00000000b
+pointAReH EQU 245 ; #111101$01b
+pointAReL EQU 0
 	
-pointAImH EQU #111110$10b
-pointAImL EQU #00000000b
+pointAImH EQU 250; #111110$10b
+pointAImL EQU 0; #00000000b
 
-pointBReH EQU #000000$11b
-pointBReL EQU #00000000b
+pointBReH EQU 5 ; #000000$11b
+pointBReL EQU 0 ; #00000000b
 	
-pointBImH EQU #000001$10b
-pointBImL EQU #00000000b
+pointBImH EQU 6; #000001$10b
+pointBImL EQU 0 ; #00000000b
 
-PX EQU #20
-NMax EQU #20
+PX EQU 20
+NMax EQU 20
 	
 ORG 00h
 	JMP init	; Sprung zum Programmanfang 
@@ -86,7 +88,19 @@ berechneDeltaC:
 	mov R1, MD1
 	; Nun befindet sich Delta c in R0 und R1
 	
+	
+	
 checkZnQuadrat:
+	mov MD0, R0
+	mov MD4, R0
+	mov MD1, R1
+	mov MD5, R1
+	;Execution Time
+	nop
+	nop
+	nop
+	nop
+	;
 	
 
 end
