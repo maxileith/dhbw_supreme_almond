@@ -1,4 +1,6 @@
-#
+$NOMOD51
+#include <Reg517a.inc>
+
 ; Zuordnung:
 ; R0 - Delta c Low-Byte
 ; R1 - Delta c High-Byte
@@ -27,6 +29,28 @@ ORG 23h
 ORG 1000h
 	
 init:			; Programmbeginn
+	; SMOD = 1
+	; PCON --> 10000000b
+	; doubles the baud rate
+	MOV PCON, #10000000b
+	
+	; COM1
+	; SM0 = 0
+	; SM1 = 1
+	; S0CON --> 01000000b fï¿½r Mode 1
+	MOV S0CON, #01000000b ;
+	; BD (Baudrate generator enabled) = 1
+	; ADCON0 --> 10000000b
+	MOV ADCON0, #10000000b
+	; 28800 Baudrate --> SMOD = 1 & S0RELH|S0RELL = 3E6h
+	MOV S0RELH, #03h
+	MOV S0RELL, #0E6h
+	
+	MOV A, #10010000b ; Serial Port 0 Interrupt erlauben
+	MOV 0A8h, A
+	
+output:
+	
 
 
 
@@ -44,8 +68,8 @@ berechneDeltaC:
 	mov A, pointBReH
 	subb A, pointAReH
 	mov R1, A
-	clr C		; Clear carry für nächste Berechnung
-	mov A, PX	; Da PX maximal 111 beträgt, genügen 8Bit und es wird keine weitere Logik benötigt
+	clr C		; Clear carry fï¿½r nï¿½chste Berechnung
+	mov A, PX	; Da PX maximal 111 betrï¿½gt, genï¿½gen 8Bit und es wird keine weitere Logik benï¿½tigt
 	dec A
 	;Berechnung von Delta c mit MDU
 	mov MD0, R0
