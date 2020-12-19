@@ -131,14 +131,42 @@ output_counter_operations:
 	
 ; calc delta C
 calcDeltaC:
-	mov A, pointBReL
-	subb A, pointAReL
+	; starting with bRe - aRe
+	mov A, #pointAReH
+	jb ACC.7, addAComplement 	; aRe is negativ
+	mov A, #pointBReH
+	jb ACC.7, addAComplement 	; bRe is negativ
+	; A > 0 and B > 0 --> normal subtraction 
+	mov A, #pointBReL
+	subb A, #pointAReL
+	mov R0, A 					; Delta c low-Byte
+	mov A, #pointBReH
+	subb A, #pointAReH
+	mov R1, A 					; Delta c high-Byte
+	clr C
+	jmp continueCalcDeltaC
+	
+addAComplement:
+	; if one of both numbers is negativ (or both are), adding the complement from a always works
+	mov A, #pointAReL
+	xrl A, #11111111b
+	add A, #1				; to generate overflow in carry bit
 	mov R0, A
-	mov A, pointBReH
-	subb A, pointAReH
+	mov A, #pointAReH
+	xrl A, #11111111b
+	addc A, #0
 	mov R1, A
-	clr C		; Clear carry f�r n�chste Berechnung
-	mov A, PX	; Da PX maximal 111 betr�gt, gen�gen 8Bit und es wird keine weitere Logik ben�tigt
+	;add a
+	mov A, #pointBReL
+	add A, R0
+	mov R0, A 				; Delta c low-Byte
+	mov A, #pointBReH
+	addc A, R1
+	mov R1, A 				; Delta c high-Byte	
+	
+continueCalcDeltaC:
+	clr C		; Clear carry für nächste Berechnung
+	mov A, #PX	; Da PX maximal 111d beträgt, genügen 8Bit und es wird keine weitere Logik benötigt
 	dec A
 	; Berechnung von Delta c mit MDU
 	mov MD0, R0
@@ -154,31 +182,67 @@ calcDeltaC:
 	mov R0, MD0
 	mov R1, MD1
 	; Nun befindet sich Delta c in R0 und R1
+	mov 0x040, R0
+	mov 0x041, R1
 	
-	
+iniZn:
+	mov R0, #pointAReL
+	mov R1, #pointAReH
+	mov R2, #pointBReL
+	mov R3, #pointBReH
 ; input:  Zn in R0 = ZnReL
 ;         R1 = ZnReH
 ;         R2 = ZnImL
 ;         R3 = ZnImH
 ; use:    R0-7
 ; output: None
-checkZnQuadrat:
-	; calc TnImQuadrat
+checkZn:
+	; check ZnRe negativ
+	mov A, R1
+	jnb ACC.7, checkZnIm
+	mov A, R0
+	xrl A, #11111111b
+	add A, #1				; to generate overflow in carry bit
+	mov R0, A
+	mov A, R1
+	xrl A, #11111111b
+	addc A, #0
+	mov R1, A
+	
+checkZnIm:
+	mov A, R3
+	jnb ACC.7, calcZnAbsolutAmount
+	mov A, R2
+	xrl A, #11111111b
+	add A, #1				; to generate overflow in carry bit
+	mov R2, A
+	mov A, R3
+	xrl A, #11111111b
+	addc A, #0
+	mov R3, A
+	
+calcZnAbsolutAmount:
+	; calc ZnImSquare
 	mov MD0, R2
 	mov MD4, R2
 	mov MD1, R3
 	mov MD5, R3
-	;Execution Time
+	; Execution Time
 	nop
 	nop
 	nop
 	nop
-	; safe ZnImQuadrat
-	mov R4, MD0
-	mov R5, MD1
-	mov R6, MD2
-	mov R7, MD3
-	; calc ZnReQuadrat
+	;check amount
+	mov R2, MD0
+	mov R3, MD1
+	mov R4, MD2
+	mov R5, MD3
+	cjne R5, #0, greaterThan2	;if R5 contains something, ZnImSquare > 4
+	mov A, R4
+	subb A, #4
+	jnc greaterThan2			; that means A was greater than 4
+	clr C
+	; calc ZnReSquare
 	mov MD0, R0
 	mov MD4, R0
 	mov MD1, R1
@@ -188,35 +252,31 @@ checkZnQuadrat:
 	nop
 	nop
 	nop
-	; calc ZnQuadrat
+	;check amount
 	mov A, MD0
-	subb A, R4
+	add A, R2
 	mov R0, A
 	mov A, MD1
-	subb A, R5
+	addc A, R3
 	mov R1, A
 	mov A, MD2
-	subb A, R6
+	addc A, R4
+	jc greaterThan2				; that means the sum was greater than 15
 	mov R2, A
-	mov A, MD3
-	subb A, R7
-	mov R3, A
-	; result in R0 (low) - R3 (high)
-;	jb ACC.0, ; negativ result
-;	cjne A, #0, endCalc ; result > 4
-;	mov A, R2
-;	clr C
-;	subb A, #4
-;	jnb C, endCalc ; result >= 4
-;	jmp nextCalc
+	subb A, #4
+	jnc greaterThan2			; that means the sum was greater than 4
+	clr C
+	mov R3, MD3
+	cjne R3, #0, greaterThan2	; if R3 contains something ZnReSquare > 4
+	jmp nextIteration
 	
+greaterThan2:
+	nop
+	; to be continued
 	
-	
-	
-
-
-
-
+nextIteration:
+	nop
+	; to be continued
 
 
 end
