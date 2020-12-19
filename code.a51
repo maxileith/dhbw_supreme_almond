@@ -6,6 +6,8 @@ $NOMOD51
 ; R1 - ZnRe High-Byte
 ; R2 - ZnIm Low-Byte
 ; R3 - ZnIm High-Byte
+; R5 - n für Modulo
+; R6 - k für Spalte
 ; R7 - Auszugebendes Zeichen
 pointAReH EQU 245 ; #111101$01b
 pointAReL EQU 0
@@ -13,7 +15,7 @@ pointAReL EQU 0
 pointAImH EQU 250; #111110$10b
 pointAImL EQU 0; #00000000b
 
-pointBReH EQU 5 ; #000000$11b
+pointBReH EQU 3 ; #000000$11b
 pointBReL EQU 0 ; #00000000b
 	
 pointBImH EQU 6; #000001$10b
@@ -88,19 +90,63 @@ berechneDeltaC:
 	mov R1, MD1
 	; Nun befindet sich Delta c in R0 und R1
 	
-	
-	
+; input: Zn in R0 = ZnReL, R1 = ZnReH, R2 = ZnImL, R3 = ZnImH
+; use: R0-7
+; output: None
 checkZnQuadrat:
-	mov MD0, R0
-	mov MD4, R0
-	mov MD1, R1
-	mov MD5, R1
+	; calc TnImQuadrat
+	mov MD0, R2
+	mov MD4, R2
+	mov MD1, R3
+	mov MD5, R3
 	;Execution Time
 	nop
 	nop
 	nop
 	nop
-	;
+	; safe ZnImQuadrat
+	mov A, MD0
+	mov R4, A
+	mov A, MD1
+	mov R5, A
+	mov A, MD2
+	mov R6, A
+	mov A, MD3
+	mov R7, A
+	; calc ZnReQuadrat
+	mov MD0, R0
+	mov MD4, R0
+	mov MD1, R1
+	mov MD5, R1
+	; Execution Time
+	nop
+	nop
+	nop
+	nop
+	; calc ZnQuadrat
+	mov A, MD0
+	subb A, R4
+	mov R0, A
+	mov A, MD1
+	subb A, R5
+	mov R1, A
+	mov A, MD2
+	subb A, R6
+	mov R2, A
+	mov A, MD3
+	subb A, R7
+	mov R3, A
+	; result in R0 (low) - R3 (high)
+	jb ACC.0, ; negativ result
+	cjne A, #0, endCalc ; result > 4
+	mov A, R2
+	clr C
+	subb A, #4
+	jnb C, endCalc ; result >= 4
+	jmp nextCalc
+	
+	
+	
 	
 
 end
