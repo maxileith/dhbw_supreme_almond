@@ -1,14 +1,15 @@
 $NOMOD51
 #include <Reg517a.inc>
 
-; Zuordnung:
-; R0 - ZnRe Low-Byte
-; R1 - ZnRe High-Byte
-; R2 - ZnIm Low-Byte
-; R3 - ZnIm High-Byte
-; R5 - n für Modulo
-; R6 - k für Spalte
-; R7 - Auszugebendes Zeichen
+; Memory Usage:
+; R0  = ZnRe Low-Byte
+; R1  = ZnRe High-Byte
+; R2  = ZnIm Low-Byte
+; R3  = ZnIm High-Byte
+; R5  = n für Modulo
+; R6  = k für Spalte
+; R7  = Auszugebendes Zeichen
+; 500 = column counter
 
 pointAReH EQU 245 ; #111101$01b
 pointAReL EQU 0
@@ -33,7 +34,6 @@ ORG 1000h
 ; input:  None
 ; use:    None
 ; output: None
-; perma:  None
 init:			; start of program
 	; SMOD = 1
 	; PCON --> 10000000b
@@ -60,7 +60,6 @@ lol:
 ; use:    A = bitwise AND
 ;         R7 = everything else
 ; output: R7 = char
-; perma:  None
 calcChar:
 	CJNE R7, #NMax, calcCharMod8 ; Jump to calcCharMod8 if n != NMax
 	MOV R7, #32d ; if n = NMax -> char = ' '
@@ -105,7 +104,6 @@ calcCharMod8eq7:
 ; use:    A = check TI and save column number
 ;         DPTR = column counter address
 ; output: None
-; perma:  500
 output:
 	; output of R7 via COM 0
 	MOV S0BUF, R7
