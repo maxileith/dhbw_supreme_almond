@@ -52,6 +52,7 @@ init:			; start of program
 	
 	MOV R7, #11010110
 
+
 ; input:  R7 = n
 ; use:    
 ; output: R7 = char
@@ -62,8 +63,8 @@ calcChar:
 calcCharMod8:
 	MOV A, R7
 	ANL A, #111b ; value of the fourth and higher bits are devidable by 8, so they dont add up to modulo
-	ADD A, @PC
-	JMP @A
+	;ADD A, @PC
+	;JMP @A
 	LJMP calcCharMod8eq0
 	LJMP calcCharMod8eq1
 	LJMP calcCharMod8eq2
@@ -139,8 +140,11 @@ calcDeltaC:
 	mov R1, MD1
 	; Nun befindet sich Delta c in R0 und R1
 	
-; input: Zn in R0 = ZnReL, R1 = ZnReH, R2 = ZnImL, R3 = ZnImH
-; use: R0-7
+; input:  Zn in R0 = ZnReL
+;         R1 = ZnReH
+;         R2 = ZnImL
+;         R3 = ZnImH
+; use:    R0-7
 ; output: None
 checkZnQuadrat:
 	; calc TnImQuadrat
@@ -154,14 +158,10 @@ checkZnQuadrat:
 	nop
 	nop
 	; safe ZnImQuadrat
-	mov A, MD0
-	mov R4, A
-	mov A, MD1
-	mov R5, A
-	mov A, MD2
-	mov R6, A
-	mov A, MD3
-	mov R7, A
+	mov R4, MD0
+	mov R5, MD1
+	mov R6, MD2
+	mov R7, MD3
 	; calc ZnReQuadrat
 	mov MD0, R0
 	mov MD4, R0
@@ -186,13 +186,13 @@ checkZnQuadrat:
 	subb A, R7
 	mov R3, A
 	; result in R0 (low) - R3 (high)
-	jb ACC.0, ; negativ result
-	cjne A, #0, endCalc ; result > 4
-	mov A, R2
-	clr C
-	subb A, #4
-	jnb C, endCalc ; result >= 4
-	jmp nextCalc
+;	jb ACC.0, ; negativ result
+;	cjne A, #0, endCalc ; result > 4
+;	mov A, R2
+;	clr C
+;	subb A, #4
+;	jnb C, endCalc ; result >= 4
+;	jmp nextCalc
 	
 	
 	
