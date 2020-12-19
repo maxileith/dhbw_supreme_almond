@@ -25,10 +25,10 @@ pointBImL EQU 0   ; #00000000b
 PX EQU 20
 NMax EQU 20
 	
-;ORG 00h
-;	JMP init	; jump to start of program
-	
-;ORG 1000h
+ORG 00h
+	JMP init	; jump to start of program
+
+ORG 1000h
 
 init:			; start of program
 	; SMOD = 1
@@ -54,7 +54,8 @@ init:			; start of program
 
 
 ; input:  R7 = n
-; use:    
+; use:    A = bitwise AND
+;         R7 = everything else
 ; output: R7 = char
 calcChar:
 	CJNE R7, #NMax, calcCharMod8 ; Jump to calcCharMod8 if n != NMax
@@ -63,35 +64,32 @@ calcChar:
 calcCharMod8:
 	MOV A, R7
 	ANL A, #111b ; value of the fourth and higher bits are devidable by 8, so they dont add up to modulo
-	;ADD A, @PC
-	;JMP @A
-	LJMP calcCharMod8eq0
-	LJMP calcCharMod8eq1
-	LJMP calcCharMod8eq2
-	LJMP calcCharMod8eq3
-	LJMP calcCharMod8eq4
-	LJMP calcCharMod8eq5
-	LJMP calcCharMod8eq6
-	LJMP calcCharMod8eq7
-calcCharMod8eq0:
+	MOV R7, A
+	CJNE R7, #0, calcCharMod8eq1
 	MOV R7, #164d
 	LJMP output
 calcCharMod8eq1:
+	DJNZ R7, calcCharMod8eq2
 	MOV R7, #43d
 	LJMP output
 calcCharMod8eq2:
+	DJNZ R7, calcCharMod8eq3
 	MOV R7, #169d
 	LJMP output
 calcCharMod8eq3:
+	DJNZ R7, calcCharMod8eq4
 	MOV R7, #45d
 	LJMP output
 calcCharMod8eq4:
+	DJNZ R7, calcCharMod8eq5
 	MOV R7, #42d
 	LJMP output
 calcCharMod8eq5:
+	DJNZ R7, calcCharMod8eq6
 	MOV R7, #64d
 	LJMP output
 calcCharMod8eq6:
+	DJNZ R7, calcCharMod8eq7
 	MOV R7, #183d
 	LJMP output
 calcCharMod8eq7:
