@@ -7,25 +7,26 @@ $NOMOD51
 ; R2 - ZnIm Low-Byte
 ; R3 - ZnIm High-Byte
 ; R7 - Auszugebendes Zeichen
+
 pointAReH EQU 245 ; #111101$01b
 pointAReL EQU 0
 	
-pointAImH EQU 250; #111110$10b
-pointAImL EQU 0; #00000000b
+pointAImH EQU 250 ; #111110$10b
+pointAImL EQU 0   ; #00000000b
 
-pointBReH EQU 5 ; #000000$11b
-pointBReL EQU 0 ; #00000000b
+pointBReH EQU 5   ; #000000$11b
+pointBReL EQU 0   ; #00000000b
 	
-pointBImH EQU 6; #000001$10b
-pointBImL EQU 0 ; #00000000b
+pointBImH EQU 6   ; #000001$10b
+pointBImL EQU 0   ; #00000000b
 
 PX EQU 20
 NMax EQU 20
 	
-ORG 00h
-	JMP init	; jump to start of program
+;ORG 00h
+;	JMP init	; jump to start of program
 	
-ORG 1000h
+;ORG 1000h
 
 init:			; start of program
 	; SMOD = 1
@@ -45,12 +46,59 @@ init:			; start of program
 	MOV S0RELH, #03h
 	MOV S0RELL, #0E6h
 	
-	; MOV A, #10010000b ; allow serial interrupt 0
-	; MOV 0A8h, A
+	; LJMP calcDeltaC
 	
-	MOV R7, #164d
+	MOV R7, #11010110
 
-; serial output
+; input:  R7 = n
+; use:    
+; output: R7 = char
+calcChar:
+	CJNE R7, #NMax, calcCharMod8 ; Jump to calcCharMod8 if n != NMax
+	MOV R7, #32d ; if n = NMax -> char = ' '
+	LJMP output
+calcCharMod8:
+	MOV A, R7
+	ANL A, #111b ; value of the fourth and higher bits are devidable by 8, so they dont add up to modulo
+	ADD A, @PC
+	JMP @A
+	LJMP calcCharMod8eq0
+	LJMP calcCharMod8eq1
+	LJMP calcCharMod8eq2
+	LJMP calcCharMod8eq3
+	LJMP calcCharMod8eq4
+	LJMP calcCharMod8eq5
+	LJMP calcCharMod8eq6
+	LJMP calcCharMod8eq7
+calcCharMod8eq0:
+	MOV R7, #164d
+	LJMP output
+calcCharMod8eq1:
+	MOV R7, #43d
+	LJMP output
+calcCharMod8eq2:
+	MOV R7, #169d
+	LJMP output
+calcCharMod8eq3:
+	MOV R7, #45d
+	LJMP output
+calcCharMod8eq4:
+	MOV R7, #42d
+	LJMP output
+calcCharMod8eq5:
+	MOV R7, #64d
+	LJMP output
+calcCharMod8eq6:
+	MOV R7, #183d
+	LJMP output
+calcCharMod8eq7:
+	MOV R7, #174d
+	LJMP output
+
+
+; input:  R7 = char
+; use:    None
+; output: None
 output:
 	; output of R7 via COM 0
 	MOV S0BUF, R7
@@ -59,7 +107,9 @@ output_wait:
 	MOV A, S0CON
 	JNB ACC.1, output_wait
 	ANL S0CON, #0FDh
-	LJMP calc
+	LJMP output
+	
+
 	
 ; calc delta C
 calcDeltaC:
@@ -72,7 +122,7 @@ calcDeltaC:
 	clr C		; Clear carry f�r n�chste Berechnung
 	mov A, PX	; Da PX maximal 111 betr�gt, gen�gen 8Bit und es wird keine weitere Logik ben�tigt
 	dec A
-	;Berechnung von Delta c mit MDU
+	; Berechnung von Delta c mit MDU
 	mov MD0, R0
 	mov MD1, R1
 	mov MD4, A
