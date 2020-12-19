@@ -53,7 +53,7 @@ init:			; start of program
 	MOV S0RELL, #0E6h
 	
 lol:
-	MOV R7, #11010110
+	MOV R7, #11010110b
 
 
 ; input:  R7 = n
