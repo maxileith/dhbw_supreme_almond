@@ -1,9 +1,15 @@
 #
-pointARe EQU #1
-pointAIm EQU #1
+pointAReH EQU #111101$10b
+pointAReL EQU #00000000b
+	
+pointAImH EQU #111110$01b
+pointAImL EQU #00000000b
 
-pointBRe EQU #1
-pointBIm EQU #1
+pointBReH EQU #000000$11b
+pointBReL EQU #00000000b
+	
+pointBImH EQU #000001$10b
+pointBImL EQU #00000000b
 
 PX EQU #20
 NMax EQU #20
@@ -17,6 +23,19 @@ ORG 23h
 ORG 1000h
 	
 init:			; Programmbeginn
+
+
+
+
+
+
+
+
+
+
+berechneDeltaC:
+	mov A, pointBRe
+	subb A, pointARe
 	
 
 end
