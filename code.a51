@@ -2,15 +2,13 @@ $NOMOD51
 #include <Reg517a.inc>
 
 ; Memory Usage:
-; R0  = ZnRe Low-Byte
-; R1  = ZnRe High-Byte
-; R2  = ZnIm Low-Byte
-; R3  = ZnIm High-Byte
 ; 40  = DeltaC Low-Byte
 ; 41  = DeltaC High-Byte
-; 50 -
+; 50
+; 51
 ; 52  = status Bytes
 ; 60  = column counter
+; 61  = row counter
 ; 70  = Re(C) Low-Byte
 ; 71  = Re(C) High-Byte
 ; 72  = Im(C) Low-Byte
@@ -44,6 +42,8 @@ program_loop:
 	LCALL calcColor
 	LCALL calcChar
 	LCALL output
+	LCALL count
+	LCALL isFinished
 	LCALL moveC
 	LJMP program_loop
 
@@ -130,48 +130,11 @@ continueCalcDeltaC:
 ;         R2 = pointBImL
 ;         R3 = pointBImH
 iniC:
-	MOV R0, #pointAReL
-	MOV R1, #pointAReH
-	MOV R2, #pointBImL
-	MOV R3, #pointBImH
-	MOV 70h, R0
-	MOV 71h, R1
-	MOV 72h, R2
-	MOV 73h, R3
-	RET
-	
-; input:  None
-; use:    R4-5, A
-; output: None
-moveC:
-	MOV A, 60h
-	JZ moveCIm ; check if column number = 0
-	; add deltaC to C (Re)
-	MOV R4, 70h
-	MOV R5, 71h
-	MOV A, 40h
-	ADD A, R4
-	MOV 70h, A
-	MOV A, 41h
-	ADDC A, R5
-	MOV 71h, A
-	RET
-moveCIm:
-	; add deltaC to C (Im)
-	MOV R4, 72h
-	MOV R5, 73h
-	MOV A, 40h
-	ADD A, R4
-	MOV 72h, A
-	MOV A, 41h
-	ADDC A, R5
-	MOV 73h, A
-	; reset C (Re)
 	MOV 70h, #pointAReL
 	MOV 71h, #pointAReH
+	MOV 72h, #pointBImL
+	MOV 73h, #pointBImH
 	RET
-	
-	
 	
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -494,20 +457,74 @@ output_wait:
 	; check if sent
 	MOV A, S0CON
 	JNB ACC.1, output_wait
-output_reset:
+output_finished:
 	ANL S0CON, #0FDh
-output_counter_operations:
+	RET
+	
+; input:  None
+; use:    A
+; output: None
+count:
 	; increase column counter
 	MOV A, 60h
 	INC A
 	MOV 60h, A
 	; check if end of row is reached
-	CJNE A, #PX, output_finished
-	MOV A, #255
+	CJNE A, #PX, count_finshed
+	; reset column count
+	MOV A, #0
 	MOV 60h, A
-	MOV R7, #10d ; new line
-	LJMP output
-output_finished:
+	; increse row counter
+	MOV A, 61h
+	INC A
+	MOV 61h, A
+	MOV R7, #10d ; print new line
+	LCALL output
+count_finshed:
 	RET
+
+; input:  None
+; use:    A
+; output: None
+isFinished:
+	MOV A, 61h
+	CJNE A, #PX, isFinishedNo
+	LJMP finish
+isFinishedNo:
+	RET
+	
+; input:  None
+; use:    R4-5, A
+; output: None
+moveC:
+	MOV A, 60h
+	JZ moveCIm ; check if column number = 0
+	; add deltaC to C (Re)
+	MOV R4, 70h
+	MOV R5, 71h
+	MOV A, 40h
+	ADD A, R4
+	MOV 70h, A
+	MOV A, 41h
+	ADDC A, R5
+	MOV 71h, A
+	RET
+moveCIm:
+	; add deltaC to C (Im)
+	MOV R4, 72h
+	MOV R5, 73h
+	MOV A, 40h
+	ADD A, R4
+	MOV 72h, A
+	MOV A, 41h
+	ADDC A, R5
+	MOV 73h, A
+	; reset C (Re)
+	MOV 70h, #pointAReL
+	MOV 71h, #pointAReH
+	RET
+	
+finish:
+	NOP
 	
 end
