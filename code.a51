@@ -207,8 +207,8 @@ calcZnAbsolutAmount:
 	mov R5, MD3
 	cjne R5, #0, greaterThan2	;if R5 contains something, ZnImSquare > 4
 	mov A, R4
-	subb A, #4
-	jnc greaterThan2			; that means A was greater than 4
+	subb A, #64
+	jnc greaterThan2				; that means A was greater than 64
 	clr C
 	; calc ZnReSquare
 	mov MD0, R0
@@ -231,21 +231,22 @@ calcZnAbsolutAmount:
 	addc A, R4
 	jc greaterThan2				; that means the sum was greater than 15
 	mov R2, A
-	subb A, #4
-	jnc greaterThan2			; that means the sum was greater than 4
+	subb A, #64
+	jnc greaterThan2				; that means the sum was greater than 4
 	clr C
 	mov R3, MD3
 	cjne R3, #0, greaterThan2	; if R3 contains something ZnReSquare > 4
 	jmp nextIteration
-	
 greaterThan2:
 	nop
-	; to be continued
-	
+	; to be continued	
 nextIteration:
 	nop
 	; to be continued
-
+mov R0, #pointAReL
+mov R1, #pointAReH
+mov R2, #pointBImL
+mov R3, #pointBImH
 ; input:  Zn in R0 = ZnReL
 ;         R1 = ZnReH
 ;         R2 = ZnImL
@@ -263,7 +264,6 @@ calcZnQuadrat:
 	add A, 0x51
 	cjne A, #1, NewZnImPositiv
 	mov 0x52, #1
-	
 NewZnImPositiv:
 	; ZnRe * ZnIm * 2 = new ZnIm
 	mov MD0, R0
@@ -306,7 +306,7 @@ NewZnImPositiv:
 	mov A, R6
 	rrc A
 	mov R6, A
-	mov A, R5                    
+	mov A, R5
 	rrc A
 	mov R5, A
 	clr C			; safety first
@@ -314,7 +314,7 @@ NewZnImPositiv:
 	mov A, 0x52
 	mov 0x52, #0 	; reset 0x52
 	jnb ACC.0, NewZnRe
-	; if ZnIm is should be negativ
+	; if ZnIm should be negativ
 	mov A, R5
 	xrl A, #11111111b
 	add A, #1				; to generate overflow in carry bit
@@ -328,7 +328,6 @@ NewZnImPositiv:
 	mov R7, A
 	mov A, R5
 	mov R6, A
-	
 	; calc NewZnRe = ZnReSquare- ZnImSquare
 NewZnRe:
 	; ZnRe and ZnIm are already positiv, so there are no problems
@@ -348,6 +347,58 @@ NewZnRe:
 	mov R4, MD2
 	mov R5, MD3
 	; calc ZnReSquare
+	mov MD0, R0
+	mov MD4, R0
+	mov MD1, R1
+	mov MD5, R1
+	; Execution Time
+	nop
+	nop
+	nop
+	nop
+	; ZnReSquare-ZnImSquare
+	mov A, MD0
+	subb A, R2
+	mov R0, A
+	mov A, MD1
+	subb A, R3
+	mov R1, A
+	mov A, MD2
+	subb A, R4
+	mov R2, A
+	mov A, MD3
+	subb A, R5
+	mov R3, A
+	; reduce to 16 bit
+	mov A, R3
+	rrc A
+	mov R3, A
+	mov A, R2
+	rrc A
+	mov R2, A
+	mov A, R1
+	rrc A
+	mov R1, A
+	clr C
+	mov A, R3
+	rrc A
+	mov R3, A
+	mov A, R2
+	rrc A
+	mov R2, A
+	mov A, R1
+	rrc A
+	mov R1, A
+	clr C			; clean up
+	; Structure output (at the moment ZnIm: R7|R6 and ZnRe: R2|R1)
+	mov A, R1
+	mov R0, A
+	mov A, R2
+	mov R1, A
+	mov A, R6
+	mov R2, A
+	mov A, R7
+	mov R3, A
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	
