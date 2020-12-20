@@ -63,82 +63,6 @@ init:			; start of program
 	MOV S0RELL, #0E6h
 	RET
 
-
-; input:  R7 = n
-; use:    A = bitwise AND
-;         R7 = everything else
-; output: R7 = char
-calcChar:
-	CJNE R7, #NMax, calcCharMod8 ; Jump to calcCharMod8 if n != NMax
-	MOV R7, #32d ; if n = NMax -> char = ' '
-	RET
-calcCharMod8:
-	MOV A, R7
-	ANL A, #111b ; value of the fourth and higher bits are devidable by 8, so they dont add up to modulo
-	MOV R7, A
-	CJNE R7, #0, calcCharMod8eq1
-	MOV R7, #164d
-	RET
-calcCharMod8eq1:
-	DJNZ R7, calcCharMod8eq2
-	MOV R7, #43d
-	RET
-calcCharMod8eq2:
-	DJNZ R7, calcCharMod8eq3
-	MOV R7, #169d
-	RET
-calcCharMod8eq3:
-	DJNZ R7, calcCharMod8eq4
-	MOV R7, #45d
-	RET
-calcCharMod8eq4:
-	DJNZ R7, calcCharMod8eq5
-	MOV R7, #42d
-	RET
-calcCharMod8eq5:
-	DJNZ R7, calcCharMod8eq6
-	MOV R7, #64d
-	RET
-calcCharMod8eq6:
-	DJNZ R7, calcCharMod8eq7
-	MOV R7, #183d
-	RET
-calcCharMod8eq7:
-	MOV R7, #174d
-	RET
-
-
-; input:  R7 = char
-; use:    A = check TI and save column number
-;         DPTR = column counter address
-; output: None
-output:
-	; output of R7 via COM 0
-	MOV S0BUF, R7
-output_wait:
-	; check if sent
-	MOV A, S0CON
-	JNB ACC.1, output_wait
-output_reset:
-	ANL S0CON, #0FDh
-output_counter_operations:
-	; increase column counter
-	MOV DPTR, #500
-	MOVX A, @DPTR
-	INC A
-	MOVX @DPTR, A
-	; check if end of row is reached
-	CJNE A, #PX, output_finished
-	MOV A, #255
-	MOVX @DPTR, A
-	MOV R7, #10d ; new line
-	LJMP output
-output_finished:
-	RET
-	
-	
-
-	
 ; calc delta C
 calcDeltaC:
 	; starting with bRe - aRe
@@ -193,13 +117,22 @@ continueCalcDeltaC:
 	mov 0x040, R0
 	mov 0x041, R1
 	RET
-	
+
 iniZn:
 	mov R0, #pointAReL
 	mov R1, #pointAReH
 	mov R2, #pointBReL
 	mov R3, #pointBReH
 	RET
+	
+	
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+calcColor:
+	; LCALL ...
+	RET
+
 
 ; input:  Zn in R0 = ZnReL
 ;         R1 = ZnReH
@@ -406,5 +339,78 @@ NewZnRe:
 	mov R4, MD2
 	mov R5, MD3
 	; calc ZnReSquare
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	
+; input:  R7 = n
+; use:    A = bitwise AND
+;         R7 = everything else
+; output: R7 = char
+calcChar:
+	CJNE R7, #NMax, calcCharMod8 ; Jump to calcCharMod8 if n != NMax
+	MOV R7, #32d ; if n = NMax -> char = ' '
+	RET
+calcCharMod8:
+	MOV A, R7
+	ANL A, #111b ; value of the fourth and higher bits are devidable by 8, so they dont add up to modulo
+	MOV R7, A
+	CJNE R7, #0, calcCharMod8eq1
+	MOV R7, #164d
+	RET
+calcCharMod8eq1:
+	DJNZ R7, calcCharMod8eq2
+	MOV R7, #43d
+	RET
+calcCharMod8eq2:
+	DJNZ R7, calcCharMod8eq3
+	MOV R7, #169d
+	RET
+calcCharMod8eq3:
+	DJNZ R7, calcCharMod8eq4
+	MOV R7, #45d
+	RET
+calcCharMod8eq4:
+	DJNZ R7, calcCharMod8eq5
+	MOV R7, #42d
+	RET
+calcCharMod8eq5:
+	DJNZ R7, calcCharMod8eq6
+	MOV R7, #64d
+	RET
+calcCharMod8eq6:
+	DJNZ R7, calcCharMod8eq7
+	MOV R7, #183d
+	RET
+calcCharMod8eq7:
+	MOV R7, #174d
+	RET
+
+; input:  R7 = char
+; use:    A = check TI and save column number
+;         DPTR = column counter address
+; output: None
+output:
+	; output of R7 via COM 0
+	MOV S0BUF, R7
+output_wait:
+	; check if sent
+	MOV A, S0CON
+	JNB ACC.1, output_wait
+output_reset:
+	ANL S0CON, #0FDh
+output_counter_operations:
+	; increase column counter
+	MOV DPTR, #500
+	MOVX A, @DPTR
+	INC A
+	MOVX @DPTR, A
+	; check if end of row is reached
+	CJNE A, #PX, output_finished
+	MOV A, #255
+	MOVX @DPTR, A
+	MOV R7, #10d ; new line
+	LJMP output
+output_finished:
+	RET
 	
 end
