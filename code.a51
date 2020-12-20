@@ -27,9 +27,20 @@ PX EQU 20
 NMax EQU 20
 	
 ORG 00h
-	JMP init	; jump to start of program
+	JMP program	; jump to start of program
 
 ORG 1000h
+	
+program:
+	LCALL init
+	LCALL calcDeltaC
+program_loop:
+	LCALL iniZn
+	LCALL moveC
+	LCALL calcColor
+	LCALL calcChar
+	LCALL output
+	LJMP program_loop
 
 ; input:  None
 ; use:    None
@@ -39,7 +50,6 @@ init:			; start of program
 	; PCON --> 10000000b
 	; doubles the baud rate
 	MOV PCON, #10000000b
-	
 	; COM1
 	; SM0 = 0
 	; SM1 = 1
@@ -51,9 +61,7 @@ init:			; start of program
 	; 28800 Baudrate --> SMOD = 1 & S0RELH|S0RELL = 3E6h
 	MOV S0RELH, #03h
 	MOV S0RELL, #0E6h
-	
-lol:
-	MOV R7, #11010110b
+	RET
 
 
 ; input:  R7 = n
@@ -63,41 +71,41 @@ lol:
 calcChar:
 	CJNE R7, #NMax, calcCharMod8 ; Jump to calcCharMod8 if n != NMax
 	MOV R7, #32d ; if n = NMax -> char = ' '
-	LJMP output
+	RET
 calcCharMod8:
 	MOV A, R7
 	ANL A, #111b ; value of the fourth and higher bits are devidable by 8, so they dont add up to modulo
 	MOV R7, A
 	CJNE R7, #0, calcCharMod8eq1
 	MOV R7, #164d
-	LJMP output
+	RET
 calcCharMod8eq1:
 	DJNZ R7, calcCharMod8eq2
 	MOV R7, #43d
-	LJMP output
+	RET
 calcCharMod8eq2:
 	DJNZ R7, calcCharMod8eq3
 	MOV R7, #169d
-	LJMP output
+	RET
 calcCharMod8eq3:
 	DJNZ R7, calcCharMod8eq4
 	MOV R7, #45d
-	LJMP output
+	RET
 calcCharMod8eq4:
 	DJNZ R7, calcCharMod8eq5
 	MOV R7, #42d
-	LJMP output
+	RET
 calcCharMod8eq5:
 	DJNZ R7, calcCharMod8eq6
 	MOV R7, #64d
-	LJMP output
+	RET
 calcCharMod8eq6:
 	DJNZ R7, calcCharMod8eq7
 	MOV R7, #183d
-	LJMP output
+	RET
 calcCharMod8eq7:
 	MOV R7, #174d
-	LJMP output
+	RET
 
 
 ; input:  R7 = char
@@ -120,11 +128,13 @@ output_counter_operations:
 	INC A
 	MOVX @DPTR, A
 	; check if end of row is reached
-	CJNE A, #PX, lol
+	CJNE A, #PX, output_finished
 	MOV A, #255
 	MOVX @DPTR, A
 	MOV R7, #10d ; new line
 	LJMP output
+output_finished:
+	RET
 	
 	
 
@@ -145,7 +155,6 @@ calcDeltaC:
 	mov R1, A 					; Delta c high-Byte
 	clr C
 	jmp continueCalcDeltaC
-	
 addAComplement:
 	; if one of both numbers is negativ (or both are), adding the complement from a always works
 	mov A, #pointAReL
@@ -163,7 +172,6 @@ addAComplement:
 	mov A, #pointBReH
 	addc A, R1
 	mov R1, A 				; Delta c high-Byte	
-	
 continueCalcDeltaC:
 	clr C		; Clear carry für nächste Berechnung
 	mov A, #PX	; Da PX maximal 111d beträgt, genügen 8Bit und es wird keine weitere Logik benötigt
@@ -184,12 +192,15 @@ continueCalcDeltaC:
 	; Nun befindet sich Delta c in R0 und R1
 	mov 0x040, R0
 	mov 0x041, R1
+	RET
 	
 iniZn:
 	mov R0, #pointAReL
 	mov R1, #pointAReH
 	mov R2, #pointBReL
 	mov R3, #pointBReH
+	RET
+
 ; input:  Zn in R0 = ZnReL
 ;         R1 = ZnReH
 ;         R2 = ZnImL
@@ -353,7 +364,7 @@ NewZnImPositiv:
 	mov A, R6
 	rrc A
 	mov R6, A
-	mov A, R5
+	mov A, R5                    
 	rrc A
 	mov R5, A
 	clr C			; safety first
