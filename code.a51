@@ -68,7 +68,9 @@ initSerialInterface:		; start of program
 	MOV S0RELL, #0E6h
 	RET
 
-; calc delta C
+; input:  None
+; use:    A, R0-1
+; output: None
 calcDeltaC:
 	; starting with bRe - aRe
 	mov A, #pointAReH
