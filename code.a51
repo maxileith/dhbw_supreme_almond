@@ -16,7 +16,7 @@ $NOMOD51
 ; 72  = Im(C) Low-Byte
 ; 73  = Im(C) High-Byte
 
-pointAReH EQU 245 ; #111101$01b
+pointAReH EQU 247 ; #111101$01b
 pointAReL EQU 0
 	
 pointAImH EQU 250 ; #111110$10b
