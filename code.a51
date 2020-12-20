@@ -6,6 +6,7 @@ $NOMOD51
 ; 41  = DeltaC High-Byte
 ; 50
 ; 51
+; 53  = set if |Zn| greater than 2
 ; 52  = status Bytes
 ; 60  = column counter
 ; 61  = row counter
@@ -237,17 +238,18 @@ calcZnAbsolutAmount:
 	clr C
 	mov R3, MD3
 	cjne R3, #0, greaterThan2	; if R3 contains something ZnReSquare > 4
-	jmp nextIteration
+	mov 0x53, #0
+	ret
+
 greaterThan2:
-	nop
+	mov 0x53, #1
+	ret
 	; to be continued	
-nextIteration:
-	nop
-	; to be continued
-mov R0, #pointAReL
-mov R1, #pointAReH
-mov R2, #pointBImL
-mov R3, #pointBImH
+
+mov R0, 70h
+mov R1, 71h
+mov R2, 72h
+mov R3, 73h
 ; input:  Zn in R0 = ZnReL
 ;         R1 = ZnReH
 ;         R2 = ZnImL
