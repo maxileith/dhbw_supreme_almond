@@ -6,10 +6,15 @@ $NOMOD51
 ; R1  = ZnRe High-Byte
 ; R2  = ZnIm Low-Byte
 ; R3  = ZnIm High-Byte
-; R5  = n für Modulo
-; R6  = k für Spalte
-; R7  = Auszugebendes Zeichen
-; 500 = column counter
+; 40  = DeltaC Low-Byte
+; 41  = DeltaC High-Byte
+; 50 -
+; 52  = status Bytes
+; 60  = column counter
+; 70  = Re(C) Low-Byte
+; 71  = Re(C) High-Byte
+; 72  = Im(C) Low-Byte
+; 73  = Im(C) High-Byte
 
 pointAReH EQU 245 ; #111101$01b
 pointAReL EQU 0
@@ -17,8 +22,8 @@ pointAReL EQU 0
 pointAImH EQU 250 ; #111110$10b
 pointAImL EQU 0   ; #00000000b
 
-pointBReH EQU 3 ; #000000$11b
-pointBReL EQU 0 ; #00000000b
+pointBReH EQU 3   ; #000000$11b
+pointBReL EQU 0   ; #00000000b
 	
 pointBImH EQU 6   ; #000001$10b
 pointBImL EQU 0   ; #00000000b
@@ -27,25 +32,25 @@ PX EQU 20
 NMax EQU 20
 	
 ORG 00h
-	JMP program	; jump to start of program
+	LJMP program	; jump to start of program
 
 ORG 1000h
 	
 program:
-	LCALL init
+	LCALL initSerialInterface
 	LCALL calcDeltaC
+	LCALL iniC
 program_loop:
-	LCALL iniZn
-	LCALL moveC
 	LCALL calcColor
 	LCALL calcChar
 	LCALL output
+	LCALL moveC
 	LJMP program_loop
 
 ; input:  None
 ; use:    None
 ; output: None
-init:			; start of program
+initSerialInterface:		; start of program
 	; SMOD = 1
 	; PCON --> 10000000b
 	; doubles the baud rate
@@ -114,16 +119,58 @@ continueCalcDeltaC:
 	mov R0, MD0
 	mov R1, MD1
 	; Nun befindet sich Delta c in R0 und R1
-	mov 0x040, R0
-	mov 0x041, R1
+	mov 40h, R0
+	mov 41h, R1
 	RET
 
-iniZn:
-	mov R0, #pointAReL
-	mov R1, #pointAReH
-	mov R2, #pointBReL
-	mov R3, #pointBReH
+; input:  None
+; use:    output
+; output: R0 = pointAReL
+;         R1 = pointAReH
+;         R2 = pointBImL
+;         R3 = pointBImH
+iniC:
+	MOV R0, #pointAReL
+	MOV R1, #pointAReH
+	MOV R2, #pointBImL
+	MOV R3, #pointBImH
+	MOV 70h, R0
+	MOV 71h, R1
+	MOV 72h, R2
+	MOV 73h, R3
 	RET
+	
+; input:  None
+; use:    R4-5, A
+; output: None
+moveC:
+	MOV A, 60h
+	JZ moveCIm ; check if column number = 0
+	; add deltaC to C (Re)
+	MOV R4, 70h
+	MOV R5, 71h
+	MOV A, 40h
+	ADD A, R4
+	MOV 70h, A
+	MOV A, 41h
+	ADDC A, R5
+	MOV 71h, A
+	RET
+moveCIm:
+	; add deltaC to C (Im)
+	MOV R4, 72h
+	MOV R5, 73h
+	MOV A, 40h
+	ADD A, R4
+	MOV 72h, A
+	MOV A, 41h
+	ADDC A, R5
+	MOV 73h, A
+	; reset C (Re)
+	MOV 70h, #pointAReL
+	MOV 71h, #pointAReH
+	RET
+	
 	
 	
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -400,14 +447,13 @@ output_reset:
 	ANL S0CON, #0FDh
 output_counter_operations:
 	; increase column counter
-	MOV DPTR, #500
-	MOVX A, @DPTR
+	MOV A, 60h
 	INC A
-	MOVX @DPTR, A
+	MOV 60h, A
 	; check if end of row is reached
 	CJNE A, #PX, output_finished
 	MOV A, #255
-	MOVX @DPTR, A
+	MOV 60h, A
 	MOV R7, #10d ; new line
 	LJMP output
 output_finished:
