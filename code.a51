@@ -151,7 +151,7 @@ calcColor:
 ;         R2 = ZnImL
 ;         R3 = ZnImH
 ; use:    R0-5
-; output: None
+; output: A = set if greater than 2
 checkZnAbsolutAmount:
 	lcall checkZnRe
 	lcall checkZnIm
@@ -240,10 +240,10 @@ calcZnAbsolutAmount:
 	clr C
 	mov R3, MD3
 	cjne R3, #0, greaterThan2	; if R3 contains something ZnReSquare > 4
-	mov 0x53, #0
+	mov A, #0
 	ret
 greaterThan2:
-	mov 0x53, #1
+	mov A, #1
 	ret
 	; to be continued	
 
