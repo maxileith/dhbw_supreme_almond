@@ -194,12 +194,20 @@ iniZn:
 ;         R1 = ZnReH
 ;         R2 = ZnImL
 ;         R3 = ZnImH
-; use:    R0-7
+; use:    R0-5
 ; output: None
-checkZn:
+checkZnAbsolutAmount:
+	call checkZnRe
+	call checkZnIm
+	jmp calcZnAbsolutAmount
+
+; this function checks whether ZnRe is negativ and gets the complement
+checkZnRe:
 	; check ZnRe negativ
+	mov 0x50, #0			; resest 0x50
 	mov A, R1
-	jnb ACC.7, checkZnIm
+	jnb ACC.7, checkZnReRet
+	mov 0x50, #1			; set 0x50 if ZnRe negativ
 	mov A, R0
 	xrl A, #11111111b
 	add A, #1				; to generate overflow in carry bit
@@ -208,10 +216,15 @@ checkZn:
 	xrl A, #11111111b
 	addc A, #0
 	mov R1, A
-	
+checkZnReRet:
+	ret
+
+; this function checks whether ZnIm is negativ and gets the complement
 checkZnIm:
+	mov 0x51, #0			; reset 0x51
 	mov A, R3
-	jnb ACC.7, calcZnAbsolutAmount
+	jnb ACC.7, checkZnImRet
+	mov 0x51, #1			; set 0x51 if ZnIm negativ
 	mov A, R2
 	xrl A, #11111111b
 	add A, #1				; to generate overflow in carry bit
@@ -220,6 +233,8 @@ checkZnIm:
 	xrl A, #11111111b
 	addc A, #0
 	mov R3, A
+checkZnImRet:
+	ret
 	
 calcZnAbsolutAmount:
 	; calc ZnImSquare
@@ -278,5 +293,107 @@ nextIteration:
 	nop
 	; to be continued
 
-
+; input:  Zn in R0 = ZnReL
+;         R1 = ZnReH
+;         R2 = ZnImL
+;         R3 = ZnImH
+; use:    R0-7
+; output: Zn in R0 = ZnReL
+;         R1 = ZnReH
+;         R2 = ZnImL
+;         R3 = ZnImH
+calcZnQuadrat:
+	; calc ZnIm
+	call checkZnRe
+	call checkZnIm
+	mov A, 0x50
+	add A, 0x51
+	cjne A, #1, NewZnImPositiv
+	mov 0x52, #1
+	
+NewZnImPositiv:
+	; ZnRe * ZnIm * 2 = new ZnIm
+	mov MD0, R0
+	mov MD4, R2
+	mov MD1, R1
+	mov MD5, R3
+	; Execution Time
+	nop
+	nop
+	nop
+	nop
+	; Get results, *2 will be realized as rlc
+	mov A, MD0		; has to be first read
+	rlc A
+	mov R4, A
+	mov A, MD1
+	rlc A
+	mov R5, A
+	mov A, MD2
+	rlc A
+	mov R6, A
+	mov A, MD3
+	rlc A
+	mov R7, A
+	clr C			; always clr c
+	; reduce to 16 Bit with rotations
+	mov A, R7
+	rrc A
+	mov R7, A
+	mov A, R6
+	rrc A
+	mov R6, A
+	mov A, R5
+	rrc A
+	mov R5, A
+	clr C
+	mov A, R7
+	rrc A
+	mov R7, A
+	mov A, R6
+	rrc A
+	mov R6, A
+	mov A, R5
+	rrc A
+	mov R5, A
+	clr C			; safety first
+	; new ZnImPositiv in R6|R5
+	mov A, 0x52
+	mov 0x52, #0 	; reset 0x52
+	jnb ACC.0, NewZnRe
+	; if ZnIm is should be negativ
+	mov A, R5
+	xrl A, #11111111b
+	add A, #1				; to generate overflow in carry bit
+	mov R5, A
+	mov A, R6
+	xrl A, #11111111b
+	addc A, #0
+	mov R6, A
+	; move new ZnIm in R7|R6 to create space
+	mov A, R6
+	mov R7, A
+	mov A, R5
+	mov R6, A
+	
+	; calc NewZnRe = ZnReSquare- ZnImSquare
+NewZnRe:
+	; ZnRe and ZnIm are already positiv, so there are no problems
+	; start with ZnImSquare, result in R5|R4|R3|R2
+	mov MD0, R2
+	mov MD4, R2
+	mov MD1, R3
+	mov MD5, R3
+	; Execution Time
+	nop
+	nop
+	nop
+	nop
+	; 
+	mov R2, MD0
+	mov R3, MD1
+	mov R4, MD2
+	mov R5, MD3
+	; calc ZnReSquare
+	
 end
