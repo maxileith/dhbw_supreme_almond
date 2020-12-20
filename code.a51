@@ -86,7 +86,7 @@ calcDeltaC:
 	subb A, #pointAReH
 	mov R1, A 					; Delta c high-Byte
 	clr C
-	jmp continueCalcDeltaC
+	ljmp continueCalcDeltaC
 addAComplement:
 	; if one of both numbers is negativ (or both are), adding the complement from a always works
 	mov A, #pointAReL
@@ -155,7 +155,7 @@ calcColor:
 checkZnAbsolutAmount:
 	call checkZnRe
 	call checkZnIm
-	jmp calcZnAbsolutAmount
+	ljmp calcZnAbsolutAmount
 
 ; this function checks whether ZnRe is negativ and gets the complement
 checkZnRe:
