@@ -38,7 +38,7 @@ ORG 1000h
 program:
 	LCALL initSerialInterface
 	LCALL calcDeltaC
-	LCALL iniC
+	LCALL initC
 program_loop:
 	LCALL calcColor
 	LCALL calcChar
@@ -103,10 +103,9 @@ addAComplement:
 	addc A, R1
 	mov R1, A 				; Delta c high-Byte	
 continueCalcDeltaC:
-	clr C		; Clear carry für nächste Berechnung
 	mov A, #PX	; Da PX maximal 111d beträgt, genügen 8Bit und es wird keine weitere Logik benötigt
 	dec A
-	; Berechnung von Delta c mit MDU
+	; Berechnung von Delta c mit MDU  (DIV)
 	mov MD0, R0
 	mov MD1, R1
 	mov MD4, A
@@ -130,7 +129,7 @@ continueCalcDeltaC:
 ;         R1 = pointAReH
 ;         R2 = pointBImL
 ;         R3 = pointBImH
-iniC:
+initC:
 	MOV 70h, #pointAReL
 	MOV 71h, #pointAReH
 	MOV 72h, #pointBImL
@@ -525,7 +524,10 @@ moveCIm:
 	MOV 70h, #pointAReL
 	MOV 71h, #pointAReH
 	RET
-	
+
+; input:  None
+; use:    None
+; output: None
 finish:
 	NOP
 	
