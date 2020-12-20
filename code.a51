@@ -51,7 +51,7 @@ program_loop:
 ; input:  None
 ; use:    None
 ; output: None
-initSerialInterface:		; start of program
+initSerialInterface:
 	; SMOD = 1
 	; PCON --> 10000000b
 	; doubles the baud rate
