@@ -151,9 +151,10 @@ calcColor:
 ; use:    R0-5
 ; output: None
 checkZnAbsolutAmount:
-	call checkZnRe
-	call checkZnIm
-	jmp calcZnAbsolutAmount
+	lcall checkZnRe
+	lcall checkZnIm
+	lcall calcZnAbsolutAmount
+	ret
 
 ; this function checks whether ZnRe is negativ and gets the complement
 checkZnRe:
@@ -239,16 +240,11 @@ calcZnAbsolutAmount:
 	cjne R3, #0, greaterThan2	; if R3 contains something ZnReSquare > 4
 	mov 0x53, #0
 	ret
-
 greaterThan2:
 	mov 0x53, #1
 	ret
 	; to be continued	
 
-mov R0, 70h
-mov R1, 71h
-mov R2, 72h
-mov R3, 73h
 ; input:  Zn in R0 = ZnReL
 ;         R1 = ZnReH
 ;         R2 = ZnImL
@@ -259,6 +255,10 @@ mov R3, 73h
 ;         R2 = ZnImL
 ;         R3 = ZnImH
 calcZnQuadrat:
+	mov R0, 70h
+	mov R1, 71h
+	mov R2, 72h
+	mov R3, 73h
 	; calc ZnIm
 	call checkZnRe
 	call checkZnIm
