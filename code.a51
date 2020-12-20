@@ -11,7 +11,7 @@ $NOMOD51
 ; R7  = Auszugebendes Zeichen
 ; 500 = column counter
 
-pointAReH EQU 245 ; #111101$01b
+pointAReH EQU 247 ; #111101$01b
 pointAReL EQU 0
 	
 pointAImH EQU 250 ; #111110$10b
@@ -36,7 +36,7 @@ program:
 	LCALL calcDeltaC
 program_loop:
 	LCALL iniZn
-	LCALL moveC
+	//LCALL moveC
 	LCALL calcColor
 	LCALL calcChar
 	LCALL output
