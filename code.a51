@@ -284,10 +284,6 @@ greaterThan2:
 ;         R2 = ZnImL
 ;         R3 = ZnImH
 calcZnQuadrat:
-	mov R0, 70h
-	mov R1, 71h
-	mov R2, 72h
-	mov R3, 73h
 	; calc ZnIm
 	lcall checkZnRe
 	lcall checkZnIm
@@ -306,21 +302,12 @@ NewZnImPositiv:
 	nop
 	nop
 	nop
-	; Get results, *2 will be realized as rlc
-	mov A, MD0		; has to be first read
-	rlc A
-	mov R4, A
-	mov A, MD1
-	rlc A
-	mov R5, A
-	mov A, MD2
-	rlc A
-	mov R6, A
-	mov A, MD3
-	rlc A
-	mov R7, A
-	clr C			; always clr c
-	; reduce to 16 Bit with rotations
+	; Get results, because of *2 there is only one rrc to reduce to 16 bit
+	mov R4, MD0		; has to be first read
+	mov R5, MD1
+	mov R6, MD2
+	mov R7, MD3
+	; reduce to 16 Bit with rotation
 	mov A, R7
 	rrc A
 	mov R7, A
@@ -331,16 +318,6 @@ NewZnImPositiv:
 	rrc A
 	mov R5, A
 	clr C
-	mov A, R7
-	rrc A
-	mov R7, A
-	mov A, R6
-	rrc A
-	mov R6, A
-	mov A, R5
-	rrc A
-	mov R5, A
-	clr C			; safety first
 	; new ZnImPositiv in R6|R5
 	mov A, 0x52
 	mov 0x52, #0 	; reset 0x52
