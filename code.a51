@@ -4,6 +4,7 @@ $NOMOD51
 ; Memory Usage:
 ; 40  = DeltaC Low-Byte
 ; 41  = DeltaC High-Byte
+; 42  = Number of Iterations
 ; 50
 ; 51
 ; 53  = set if |Zn| greater than 2
@@ -143,6 +144,21 @@ initC:
 
 calcColor:
 	; LCALL ...
+	MOV 0x42, #1
+	MOV R0, 70h
+	MOV R1, 71h
+	MOV R2, 72h
+	MOV R3, 73h
+calcColorLoop:
+	LCALL checkZnAbsolutAmount
+	JB ACC.0, endCalcColor
+	LCALL calcZnQuadrat
+	LCALL addCToZ
+	INC 0x42
+	MOV A, 0x42
+	CJNE A, #NMax, calcColorLoop	
+endCalcColor:
+	MOV R7, 0x42
 	RET
 
 
