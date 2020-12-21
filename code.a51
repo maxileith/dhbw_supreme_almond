@@ -166,7 +166,7 @@ endCalcColor:
 ;         R1 = ZnReH
 ;         R2 = ZnImL
 ;         R3 = ZnImH
-; use:    R0-5
+; use:    R0-6
 ; output: A = set if greater than 2
 checkZnAbsolutAmount:
 	; store Zn in 55-58h temporarily
@@ -270,6 +270,15 @@ calcZnAbsolutAmount:
 	CJNE A, #0, greaterThan2
 	
 	mov A, #0
+	;jc greaterThan2				; that means the sum was greater than 15
+	;mov R2, A
+	;mov R3, MD3
+	;cjne R3, #0, greaterThan2	; if R3 contains something ZnReSquare > 4
+	;mov A, R2
+	;subb A, #64
+	;jnc greaterThan2				; that means the sum was greater than 4 -->
+	;clr C
+	;mov A, #0
 	ret
 greaterThan2:
 	mov A, #1
