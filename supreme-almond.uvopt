@@ -140,11 +140,7 @@
         <Mm>
           <WinNumber>1</WinNumber>
           <SubType>0</SubType>
-<<<<<<< HEAD
           <ItemText>D:0x00</ItemText>
-=======
-          <ItemText>d:60h</ItemText>
->>>>>>> 681497c72c08e6a701a626ef410383aad6c82d69
           <AccSizeX>0</AccSizeX>
         </Mm>
       </MemoryWindow1>
