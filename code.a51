@@ -146,6 +146,7 @@ calcColor:
 	MOV R1, 71h
 	MOV R2, 72h
 	MOV R3, 73h
+	NOP
 calcColorLoop:
 	LCALL checkZnAbsolutAmount
 	JB ACC.0, endCalcColor
