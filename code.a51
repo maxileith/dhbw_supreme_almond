@@ -173,7 +173,6 @@ checkZnAbsolutAmount:
 	lcall checkZnIm
 	lcall calcZnAbsolutAmount
 	ret
-
 ; this function checks whether ZnRe is negativ and gets the complement
 checkZnRe:
 	; check ZnRe negativ
@@ -191,7 +190,6 @@ checkZnRe:
 	mov R1, A
 checkZnReRet:
 	ret
-
 ; this function checks whether ZnIm is negativ and gets the complement
 checkZnIm:
 	mov 0x51, #0			; reset 0x51
@@ -420,6 +418,34 @@ NewZnRe:
 	mov A, R7
 	mov R3, A
 
+; input:  Zn in R0 = ZnReL
+;         R1 = ZnReH
+;         R2 = ZnImL
+;         R3 = ZnImH
+; use:    R0-3, A
+; output: Zn in R0 = ZnReL
+;         R1 = ZnReH
+;         R2 = ZnImL
+;         R3 = ZnImH
+addCToZ:
+	; Re Low
+	MOV A, 70h
+	ADD A, R0
+	MOV R0, A
+	; Re High
+	MOV A, 71h
+	ADDC A, R1
+	MOV R1, A
+	; Im Low
+	MOV A, 72h
+	ADD A, R2
+	MOV R2, A
+	; Im High
+	MOV A, 73h
+	ADDC A, R3
+	MOV R3, A
+	RET
+	
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 	
 ; input:  R7 = n
