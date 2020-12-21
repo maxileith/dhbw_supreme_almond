@@ -52,7 +52,7 @@ program_loop:
 ; input:  None
 ; use:    None
 ; output: None
-initSerialInterface:		; start of program
+initSerialInterface:
 	; SMOD = 1
 	; PCON --> 10000000b
 	; doubles the baud rate
@@ -87,7 +87,7 @@ calcDeltaC:
 	subb A, #pointAReH
 	mov R1, A 					; Delta c high-Byte
 	clr C
-	jmp continueCalcDeltaC
+	ljmp continueCalcDeltaC
 addAComplement:
 	; if one of both numbers is negativ (or both are), adding the complement from a always works
 	mov A, #pointAReL
