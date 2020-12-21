@@ -16,8 +16,8 @@ $NOMOD51
 ; 72  = Im(C) Low-Byte
 ; 73  = Im(C) High-Byte
 
-pointAReH EQU 247 ; #111101$01b
-pointAReL EQU 0
+pointAReH EQU 247 ; #111101$11b
+pointAReL EQU 0   ; #00000000b
 	
 pointAImH EQU 250 ; #111110$10b
 pointAImL EQU 0   ; #00000000b
@@ -566,14 +566,15 @@ moveC:
 	MOV 71h, A
 	RET
 moveCIm:
-	; add deltaC to C (Im)
+	; sub deltaC from C (Im)
 	MOV R4, 72h
 	MOV R5, 73h
 	MOV A, 40h
-	ADD A, R4
+	CLR C
+	SUBB A, R4
 	MOV 72h, A
 	MOV A, 41h
-	ADDC A, R5
+	SUBB A, R5
 	MOV 73h, A
 	; reset C (Re)
 	MOV 70h, #pointAReL
