@@ -149,6 +149,7 @@ calcColor:
 	MOV R1, 71h
 	MOV R2, 72h
 	MOV R3, 73h
+	NOP
 calcColorLoop:
 	LCALL checkZnAbsolutAmount
 	JB ACC.0, endCalcColor
@@ -441,7 +442,8 @@ NewZnRe:
 	mov R2, A
 	mov A, R7
 	mov R3, A
-
+	ret
+	
 ; input:  Zn in R0 = ZnReL
 ;         R1 = ZnReH
 ;         R2 = ZnImL
