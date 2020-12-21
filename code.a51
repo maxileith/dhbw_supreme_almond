@@ -119,11 +119,8 @@ continueCalcDeltaC:
 	nop
 	nop
 	; Ergebnis holen
-	mov R0, MD0
-	mov R1, MD1
-	; Nun befindet sich Delta c in R0 und R1
-	mov 40h, R0
-	mov 41h, R1
+	mov 40h, MD0
+	mov 41h, MD1
 	RET
 
 ; input:  None
