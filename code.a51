@@ -17,7 +17,7 @@ $NOMOD51
 ; 73  = Im(C) High-Byte
 
 pointAReH EQU 247 ; #111101$11b
-pointAReL EQU 0
+pointAReL EQU 0   ; #00000000b
 	
 pointAImH EQU 250 ; #111110$10b
 pointAImL EQU 0   ; #00000000b
@@ -233,11 +233,13 @@ calcZnAbsolutAmount:
 	mov R3, MD1
 	mov R4, MD2
 	mov R5, MD3
-	cjne R5, #0, greaterThan2		;if R5 contains something, ZnImSquare > 4
-	mov A, R4
-	subb A, #64
-	jnc greaterThan2				; that means A was greater than 64
-	clr C
+	
+	; check if already greater than 4
+	CJNE R5, #0, greaterThan2
+	MOV A, R4
+	ANL A, #11000000b
+	CJNE A, #0, greaterThan2
+	
 	; calc ZnReSquare
 	mov MD0, R0
 	mov MD4, R0
@@ -251,20 +253,22 @@ calcZnAbsolutAmount:
 	;check amount
 	mov A, MD0
 	add A, R2
-	mov R0, A
+	mov R2, A
 	mov A, MD1
 	addc A, R3
-	mov R1, A
+	mov R3, A
 	mov A, MD2
 	addc A, R4
-	mov R2, A
-	mov A, MD3
-	addc A, R5
-	mov R3, A
-	cjne R3, #0, greaterThan2		; if R3 contains something ZnReSquare > 4
-	mov A, R2
-	anl A, #11000000b
-	cjne A, #0, greaterThan2
+	MOV R4, A
+	MOV A, MD3
+	ADDC A, R5
+	
+	; check if greater than 4
+	CJNE A, #0, greaterThan2
+	MOV A, R4
+	ANL A, #11000000b
+	CJNE A, #0, greaterThan2
+	
 	mov A, #0
 	;jc greaterThan2				; that means the sum was greater than 15
 	;mov R2, A
@@ -527,22 +531,18 @@ output_finished:
 	RET
 	
 ; input:  None
-; use:    A
+; use:    None
 ; output: None
 count:
 	; increase column counter
+	INC 60h
 	MOV A, 60h
-	INC A
-	MOV 60h, A
 	; check if end of row is reached
 	CJNE A, #PX, count_finshed
 	; reset column count
-	MOV A, #0
-	MOV 60h, A
+	MOV 60h, #0
 	; increse row counter
-	MOV A, 61h
-	INC A
-	MOV 61h, A
+	INC 61h
 	MOV R7, #10d ; print new line
 	LCALL output
 count_finshed:
@@ -575,14 +575,15 @@ moveC:
 	MOV 71h, A
 	RET
 moveCIm:
-	; add deltaC to C (Im)
+	; sub deltaC from C (Im)
 	MOV R4, 72h
 	MOV R5, 73h
 	MOV A, 40h
-	ADD A, R4
+	CLR C
+	SUBB A, R4
 	MOV 72h, A
 	MOV A, 41h
-	ADDC A, R5
+	SUBB A, R5
 	MOV 73h, A
 	; reset C (Re)
 	MOV 70h, #pointAReL
