@@ -284,10 +284,6 @@ greaterThan2:
 ;         R2 = ZnImL
 ;         R3 = ZnImH
 calcZnQuadrat:
-	mov R0, 70h
-	mov R1, 71h
-	mov R2, 72h
-	mov R3, 73h
 	; calc ZnIm
 	lcall checkZnRe
 	lcall checkZnIm
