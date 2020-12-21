@@ -16,20 +16,20 @@ $NOMOD51
 ; 72  = Im(C) Low-Byte
 ; 73  = Im(C) High-Byte
 
-pointAReH EQU 247 ; #111101$11b
-pointAReL EQU 0   ; #00000000b
+pointAReH EQU 247d ; #111101$11b
+pointAReL EQU 0d   ; #00000000b
 	
-pointAImH EQU 250 ; #111110$10b
-pointAImL EQU 0   ; #00000000b
+pointAImH EQU 250d ; #111110$10b
+pointAImL EQU 0d   ; #00000000b
 
-pointBReH EQU 3   ; #000000$11b
-pointBReL EQU 0   ; #00000000b
+pointBReH EQU 3d   ; #000000$11b
+pointBReL EQU 0d   ; #00000000b
 	
-pointBImH EQU 6   ; #000001$10b
-pointBImL EQU 0   ; #00000000b
+pointBImH EQU 6d   ; #000001$10b
+pointBImL EQU 0d   ; #00000000b
 
-PX EQU 20
-NMax EQU 20
+PX EQU 20d
+NMax EQU 20d
 	
 ORG 00h
 	LJMP program	; jump to start of program
@@ -75,10 +75,10 @@ initSerialInterface:
 ; output: None
 calcDeltaC:
 	; starting with bRe - aRe
-	mov A, #pointAReH
-	jb ACC.7, addAComplement 	; aRe is negativ
-	mov A, #pointBReH
-	jb ACC.7, addAComplement 	; bRe is negativ
+	; mov A, #pointAReH
+	; jb ACC.7, addAComplement 	; aRe is negativ
+	; mov A, #pointBReH
+	; jb ACC.7, addAComplement 	; bRe is negativ
 	; A > 0 and B > 0 --> normal subtraction 
 	mov A, #pointBReL
 	subb A, #pointAReL
@@ -88,27 +88,27 @@ calcDeltaC:
 	mov R1, A 					; Delta c high-Byte
 	clr C
 	ljmp continueCalcDeltaC
-addAComplement:
-	; if one of both numbers is negativ (or both are), adding the complement from a always works
-	mov A, #pointAReL
-	xrl A, #11111111b
-	add A, #1				; to generate overflow in carry bit
-	mov R0, A
-	mov A, #pointAReH
-	xrl A, #11111111b
-	addc A, #0
-	mov R1, A
-	;add a
-	mov A, #pointBReL
-	add A, R0
-	mov R0, A 				; Delta c low-Byte
-	mov A, #pointBReH
-	addc A, R1
-	mov R1, A 				; Delta c high-Byte	
+;addAComplement:
+;	; if one of both numbers is negativ (or both are), adding the complement from a always works
+;	mov A, #pointAReL
+;	xrl A, #11111111b
+;	add A, #1				; to generate overflow in carry bit
+;	mov R0, A
+;	mov A, #pointAReH
+;	xrl A, #11111111b
+;	addc A, #0
+;	mov R1, A
+;	;add a
+;	mov A, #pointBReL
+;	add A, R0
+;	mov R0, A 				; Delta c low-Byte
+;	mov A, #pointBReH
+;	addc A, R1
+;	mov R1, A 				; Delta c high-Byte	
 continueCalcDeltaC:
 	mov A, #PX	; Da PX maximal 111d beträgt, genügen 8Bit und es wird keine weitere Logik benötigt
 	dec A
-	; Berechnung von Delta c mit MDU  (DIV)
+	; Berechnung von Delta c mit MDU (DIV)
 	mov MD0, R0
 	mov MD1, R1
 	mov MD4, A
@@ -119,11 +119,8 @@ continueCalcDeltaC:
 	nop
 	nop
 	; Ergebnis holen
-	mov R0, MD0
-	mov R1, MD1
-	; Nun befindet sich Delta c in R0 und R1
-	mov 40h, R0
-	mov 41h, R1
+	mov 40h, MD0
+	mov 41h, MD1
 	RET
 
 ; input:  None
@@ -271,15 +268,6 @@ calcZnAbsolutAmount:
 	CJNE A, #0, greaterThan2
 	
 	mov A, #0
-	;jc greaterThan2				; that means the sum was greater than 15
-	;mov R2, A
-	;mov R3, MD3
-	;cjne R3, #0, greaterThan2	; if R3 contains something ZnReSquare > 4
-	;mov A, R2
-	;subb A, #64
-	;jnc greaterThan2				; that means the sum was greater than 4 -->
-	;clr C
-	;mov A, #0
 	ret
 greaterThan2:
 	mov A, #1
@@ -442,8 +430,8 @@ NewZnRe:
 	mov R2, A
 	mov A, R7
 	mov R3, A
-	ret
-	
+	RET
+
 ; input:  Zn in R0 = ZnReL
 ;         R1 = ZnReH
 ;         R2 = ZnImL
