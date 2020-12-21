@@ -291,8 +291,8 @@ calcZnQuadrat:
 	mov R2, 72h
 	mov R3, 73h
 	; calc ZnIm
-	call checkZnRe
-	call checkZnIm
+	lcall checkZnRe
+	lcall checkZnIm
 	mov A, 0x50
 	add A, 0x51
 	cjne A, #1, NewZnImPositiv
@@ -567,14 +567,12 @@ moveC:
 	RET
 moveCIm:
 	; sub deltaC from C (Im)
-	MOV R4, 72h
-	MOV R5, 73h
-	MOV A, 40h
 	CLR C
-	SUBB A, R4
+	MOV A, 72h
+	SUBB A, 40h 
 	MOV 72h, A
-	MOV A, 41h
-	SUBB A, R5
+	MOV A, 73h
+	SUBB A, 41h
 	MOV 73h, A
 	; reset C (Re)
 	MOV 70h, #pointAReL
