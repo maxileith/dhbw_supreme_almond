@@ -169,10 +169,19 @@ endCalcColor:
 ; use:    R0-5
 ; output: A = set if greater than 2
 checkZnAbsolutAmount:
-	lcall checkZnRe
-	lcall checkZnIm
-	lcall calcZnAbsolutAmount
-	ret
+	; store Zn in 55-58h temporarily
+	MOV 0x55, R0
+	MOV 0x56, R1
+	MOV 0x57, R2
+	MOV 0x58, R3
+	LCALL checkZnRe
+	LCALL checkZnIm
+	LCALL calcZnAbsolutAmount
+	MOV R0, 0x55
+	MOV R1, 0x56
+	MOV R2, 0x57
+	MOV R3, 0x58
+	RET
 
 ; this function checks whether ZnRe is negativ and gets the complement
 checkZnRe:
