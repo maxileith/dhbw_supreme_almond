@@ -16,7 +16,7 @@ $NOMOD51
 ; 72  = Im(C) Low-Byte
 ; 73  = Im(C) High-Byte
 
-pointAReH EQU 247 ; #111101$01b
+pointAReH EQU 247 ; #111101$11b
 pointAReL EQU 0
 	
 pointAImH EQU 250 ; #111110$10b
@@ -166,7 +166,7 @@ endCalcColor:
 ;         R1 = ZnReH
 ;         R2 = ZnImL
 ;         R3 = ZnImH
-; use:    R0-5
+; use:    R0-6
 ; output: A = set if greater than 2
 checkZnAbsolutAmount:
 	; store Zn in 55-58h temporarily
@@ -233,7 +233,7 @@ calcZnAbsolutAmount:
 	mov R3, MD1
 	mov R4, MD2
 	mov R5, MD3
-	cjne R5, #0, greaterThan2	;if R5 contains something, ZnImSquare > 4
+	cjne R5, #0, greaterThan2		;if R5 contains something, ZnImSquare > 4
 	mov A, R4
 	subb A, #64
 	jnc greaterThan2				; that means A was greater than 64
@@ -257,14 +257,24 @@ calcZnAbsolutAmount:
 	mov R1, A
 	mov A, MD2
 	addc A, R4
-	jc greaterThan2				; that means the sum was greater than 15
 	mov R2, A
-	subb A, #64
-	jnc greaterThan2				; that means the sum was greater than 4
-	clr C
-	mov R3, MD3
-	cjne R3, #0, greaterThan2	; if R3 contains something ZnReSquare > 4
+	mov A, MD3
+	addc A, R5
+	mov R3, A
+	cjne R3, #0, greaterThan2		; if R3 contains something ZnReSquare > 4
+	mov A, R2
+	anl A, #11000000b
+	cjne A, #0, greaterThan2
 	mov A, #0
+	;jc greaterThan2				; that means the sum was greater than 15
+	;mov R2, A
+	;mov R3, MD3
+	;cjne R3, #0, greaterThan2	; if R3 contains something ZnReSquare > 4
+	;mov A, R2
+	;subb A, #64
+	;jnc greaterThan2				; that means the sum was greater than 4 -->
+	;clr C
+	;mov A, #0
 	ret
 greaterThan2:
 	mov A, #1
