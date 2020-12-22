@@ -16,20 +16,34 @@ $NOMOD51
 ; 72  = Im(C) Low-Byte
 ; 73  = Im(C) High-Byte
 
-pointAReH EQU 252d ; #111111$00b
-pointAReL EQU 205d ; #11001101b
+; Startwerte a)
+pointAReH EQU 247d ; #111101$11b
+pointAReL EQU 0d   ; #00000000b
 	
-pointAImH EQU 254d ; #111111$10b
-pointAImL EQU 103d ; #01100111b
+pointAImH EQU 250d ; #111110$10b
+pointAImL EQU 0d   ; #00000000b
 
-pointBReH EQU 2d   ; #000000$10b
-pointBReL EQU 102d ; #01100110b
+pointBReH EQU 3d   ; #000000$11b
+pointBReL EQU 0d   ; #00000000b
 	
-pointBImH EQU 4d   ; #000001$00b
+pointBImH EQU 6d   ; #000001$10b
 pointBImL EQU 0d   ; #00000000b
 
-PX EQU 111d
-NMax EQU 60d
+; Startwerte b)
+;pointAReH EQU 252d ; #111111$00b
+;pointAReL EQU 205d ; #11001101b
+;	
+;pointAImH EQU 254d ; #111111$10b
+;pointAImL EQU 103d ; #01100111b
+
+;pointBReH EQU 2d   ; #000000$10b
+;pointBReL EQU 102d ; #01100110b
+;	
+;pointBImH EQU 4d   ; #000001$00b
+;pointBImL EQU 0d   ; #00000000b
+
+PX EQU 20d
+NMax EQU 20d
 	
 ORG 00h
 	LJMP program	; jump to start of program
