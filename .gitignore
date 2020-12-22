@@ -3,4 +3,4 @@ Listings/*
 *.obj
 *.lst
 *.uvgui.*
-*.txt
+output.txt
