@@ -28,7 +28,7 @@ pointBReL EQU 0d   ; #00000000b
 pointBImH EQU 6d   ; #000001$10b
 pointBImL EQU 0d   ; #00000000b
 
-PX EQU 20d
+PX EQU 21d
 NMax EQU 20d
 	
 ORG 00h
