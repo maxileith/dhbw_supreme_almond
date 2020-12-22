@@ -366,6 +366,7 @@ NewZnRe:
 	nop
 	nop
 	; ZnReSquare-ZnImSquare
+	CLR C
 	mov A, MD0
 	subb A, R2
 	mov R0, A
@@ -379,6 +380,7 @@ NewZnRe:
 	subb A, R5
 	mov R3, A
 	; reduce to 16 bit
+	CLR C
 	mov A, R3
 	rrc A
 	mov R3, A
