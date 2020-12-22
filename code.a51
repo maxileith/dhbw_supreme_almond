@@ -88,12 +88,6 @@ initSerialInterface:
 ; use:    A, R0-1
 ; output: None
 calcDeltaC:
-	; starting with bRe - aRe
-	; MOV A, #pointAReH
-	; JB ACC.7, addAComplement 	; aRe is negativ
-	; MOV A, #pointBReH
-	; JB ACC.7, addAComplement 	; bRe is negativ
-	; A > 0 and B > 0 --> normal subtraction 
 	MOV A, #pointBReL
 	SUBB A, #pointAReL
 	MOV R0, A 					; Delta c low-Byte
@@ -101,25 +95,6 @@ calcDeltaC:
 	SUBB A, #pointAReH
 	MOV R1, A 					; Delta c high-Byte
 	CLR C
-	LJMP continueCalcDeltaC
-;addAComplement:
-;	; if one of both numbers is negativ (or both are), adding the complement from a always works
-;	MOV A, #pointAReL
-;	XRL A, #11111111b
-;	ADD A, #1				; to generate overflow in carry bit
-;	MOV R0, A
-;	MOV A, #pointAReH
-;	XRL A, #11111111b
-;	ADDC A, #0
-;	MOV R1, A
-;	;ADD a
-;	MOV A, #pointBReL
-;	ADD A, R0
-;	MOV R0, A 				; Delta c low-Byte
-;	MOV A, #pointBReH
-;	ADDC A, R1
-;	MOV R1, A 				; Delta c high-Byte	
-continueCalcDeltaC:
 	MOV A, #PX	; Da PX maximal 111d beträgt, genügen 8Bit und es wird keine weitere Logik benötigt
 	DEC  A
 	; Berechnung von Delta c mit MDU (DIV)
