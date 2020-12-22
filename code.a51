@@ -285,6 +285,7 @@ greaterThan2:
 ;         R3 = ZnImH
 calcZnQuadrat:
 	; calc ZnIm
+ 	clr c			; safety first
 	lcall checkZnRe
 	lcall checkZnIm
 	mov A, 0x50
@@ -331,13 +332,13 @@ NewZnImPositiv:
 	xrl A, #11111111b
 	addc A, #0
 	mov R6, A
+NewZnRe:
 	; move new ZnIm in R7|R6 to create space
 	mov A, R6
 	mov R7, A
 	mov A, R5
 	mov R6, A
 	; calc NewZnRe = ZnReSquare- ZnImSquare
-NewZnRe:
 	; ZnRe and ZnIm are already positiv, so there are no problems
 	; start with ZnImSquare, result in R5|R4|R3|R2
 	mov MD0, R2
