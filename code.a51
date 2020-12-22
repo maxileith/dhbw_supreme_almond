@@ -28,8 +28,8 @@ pointBReL EQU 0d   ; #00000000b
 pointBImH EQU 6d   ; #000001$10b
 pointBImL EQU 0d   ; #00000000b
 
-PX EQU 21d
-NMax EQU 20d
+PX EQU 255d
+NMax EQU 255d
 	
 ORG 00h
 	LJMP program	; jump to start of program
@@ -75,52 +75,52 @@ initSerialInterface:
 ; output: None
 calcDeltaC:
 	; starting with bRe - aRe
-	; mov A, #pointAReH
-	; jb ACC.7, addAComplement 	; aRe is negativ
-	; mov A, #pointBReH
-	; jb ACC.7, addAComplement 	; bRe is negativ
+	; MOV A, #pointAReH
+	; JB ACC.7, addAComplement 	; aRe is negativ
+	; MOV A, #pointBReH
+	; JB ACC.7, addAComplement 	; bRe is negativ
 	; A > 0 and B > 0 --> normal subtraction 
-	mov A, #pointBReL
-	subb A, #pointAReL
-	mov R0, A 					; Delta c low-Byte
-	mov A, #pointBReH
-	subb A, #pointAReH
-	mov R1, A 					; Delta c high-Byte
-	clr C
-	ljmp continueCalcDeltaC
+	MOV A, #pointBReL
+	SUBB A, #pointAReL
+	MOV R0, A 					; Delta c low-Byte
+	MOV A, #pointBReH
+	SUBB A, #pointAReH
+	MOV R1, A 					; Delta c high-Byte
+	CLR C
+	LJMP continueCalcDeltaC
 ;addAComplement:
 ;	; if one of both numbers is negativ (or both are), adding the complement from a always works
-;	mov A, #pointAReL
-;	xrl A, #11111111b
-;	add A, #1				; to generate overflow in carry bit
-;	mov R0, A
-;	mov A, #pointAReH
-;	xrl A, #11111111b
-;	addc A, #0
-;	mov R1, A
-;	;add a
-;	mov A, #pointBReL
-;	add A, R0
-;	mov R0, A 				; Delta c low-Byte
-;	mov A, #pointBReH
-;	addc A, R1
-;	mov R1, A 				; Delta c high-Byte	
+;	MOV A, #pointAReL
+;	XRL A, #11111111b
+;	ADD A, #1				; to generate overflow in carry bit
+;	MOV R0, A
+;	MOV A, #pointAReH
+;	XRL A, #11111111b
+;	ADDC A, #0
+;	MOV R1, A
+;	;ADD a
+;	MOV A, #pointBReL
+;	ADD A, R0
+;	MOV R0, A 				; Delta c low-Byte
+;	MOV A, #pointBReH
+;	ADDC A, R1
+;	MOV R1, A 				; Delta c high-Byte	
 continueCalcDeltaC:
-	mov A, #PX	; Da PX maximal 111d beträgt, genügen 8Bit und es wird keine weitere Logik benötigt
-	dec A
+	MOV A, #PX	; Da PX maximal 111d beträgt, genügen 8Bit und es wird keine weitere Logik benötigt
+	DEC  A
 	; Berechnung von Delta c mit MDU (DIV)
-	mov MD0, R0
-	mov MD1, R1
-	mov MD4, A
-	mov MD5, #0
+	MOV MD0, R0
+	MOV MD1, R1
+	MOV MD4, A
+	MOV MD5, #0
 	; Execution Time
-	nop
-	nop
-	nop
-	nop
+	NOP
+	NOP
+	NOP
+	NOP
 	; Ergebnis holen
-	mov 40h, MD0
-	mov 41h, MD1
+	MOV 40h, MD0
+	MOV 41h, MD1
 	RET
 
 ; input:  None
@@ -184,53 +184,53 @@ checkZnAbsolutAmount:
 ; this function checks whether ZnRe is negativ and gets the complement
 checkZnRe:
 	; check ZnRe negativ
-	mov 0x50, #0			; resest 0x50
-	mov A, R1
-	jnb ACC.7, checkZnReRet
-	mov 0x50, #1			; set 0x50 if ZnRe negativ
-	mov A, R0
-	xrl A, #11111111b
-	add A, #1				; to generate overflow in carry bit
-	mov R0, A
-	mov A, R1
-	xrl A, #11111111b
-	addc A, #0
-	mov R1, A
+	MOV 0x50, #0			; resest 0x50
+	MOV A, R1
+	JNB ACC.7, checkZnReRet
+	MOV 0x50, #1			; set 0x50 if ZnRe negativ
+	MOV A, R0
+	XRL A, #11111111b
+	ADD A, #1				; to generate overflow in carry bit
+	MOV R0, A
+	MOV A, R1
+	XRL A, #11111111b
+	ADDC A, #0
+	MOV R1, A
 checkZnReRet:
-	ret
+	RET
 ; this function checks whether ZnIm is negativ and gets the complement
 checkZnIm:
-	mov 0x51, #0			; reset 0x51
-	mov A, R3
-	jnb ACC.7, checkZnImRet
-	mov 0x51, #1			; set 0x51 if ZnIm negativ
-	mov A, R2
-	xrl A, #11111111b
-	add A, #1				; to generate overflow in carry bit
-	mov R2, A
-	mov A, R3
-	xrl A, #11111111b
-	addc A, #0
-	mov R3, A
+	MOV 0x51, #0			; reset 0x51
+	MOV A, R3
+	JNB ACC.7, checkZnImRet
+	MOV 0x51, #1			; set 0x51 if ZnIm negativ
+	MOV A, R2
+	XRL A, #11111111b
+	ADD A, #1				; to generate overflow in carry bit
+	MOV R2, A
+	MOV A, R3
+	XRL A, #11111111b
+	ADDC A, #0
+	MOV R3, A
 checkZnImRet:
-	ret
+	RET
 	
 calcZnAbsolutAmount:
 	; calc ZnImSquare
-	mov MD0, R2
-	mov MD4, R2
-	mov MD1, R3
-	mov MD5, R3
+	MOV MD0, R2
+	MOV MD4, R2
+	MOV MD1, R3
+	MOV MD5, R3
 	; Execution Time
-	nop
-	nop
-	nop
-	nop
+	NOP
+	NOP
+	NOP
+	NOP
 	;check amount
-	mov R2, MD0
-	mov R3, MD1
-	mov R4, MD2
-	mov R5, MD3
+	MOV R2, MD0
+	MOV R3, MD1
+	MOV R4, MD2
+	MOV R5, MD3
 	
 	; check if already greater than 4
 	CJNE R5, #0, greaterThan2
@@ -239,24 +239,24 @@ calcZnAbsolutAmount:
 	CJNE A, #0, greaterThan2
 	
 	; calc ZnReSquare
-	mov MD0, R0
-	mov MD4, R0
-	mov MD1, R1
-	mov MD5, R1
+	MOV MD0, R0
+	MOV MD4, R0
+	MOV MD1, R1
+	MOV MD5, R1
 	; Execution Time
-	nop
-	nop
-	nop
-	nop
+	NOP
+	NOP
+	NOP
+	NOP
 	;check amount
-	mov A, MD0
-	add A, R2
-	mov R2, A
-	mov A, MD1
-	addc A, R3
-	mov R3, A
-	mov A, MD2
-	addc A, R4
+	MOV A, MD0
+	ADD A, R2
+	MOV R2, A
+	MOV A, MD1
+	ADDC A, R3
+	MOV R3, A
+	MOV A, MD2
+	ADDC A, R4
 	MOV R4, A
 	MOV A, MD3
 	ADDC A, R5
@@ -267,11 +267,11 @@ calcZnAbsolutAmount:
 	ANL A, #11000000b
 	CJNE A, #0, greaterThan2
 	
-	mov A, #0
-	ret
+	MOV A, #0
+	RET
 greaterThan2:
-	mov A, #1
-	ret
+	MOV A, #1
+	RET
 	; to be continued	
 
 ; input:  Zn in R0 = ZnReL
@@ -285,131 +285,131 @@ greaterThan2:
 ;         R3 = ZnImH
 calcZnQuadrat:
 	; calc ZnIm
- 	clr c			; safety first
-	lcall checkZnRe
-	lcall checkZnIm
-	mov A, 0x50
-	add A, 0x51
-	cjne A, #1, NewZnImPositiv
-	mov 0x52, #1
+ 	CLR c			; safety first
+	LCALL checkZnRe
+	LCALL checkZnIm
+	MOV A, 0x50
+	ADD A, 0x51
+	CJNE A, #1, NewZnImPositiv
+	MOV 0x52, #1
 NewZnImPositiv:
 	; ZnRe * ZnIm * 2 = new ZnIm
-	mov MD0, R0
-	mov MD4, R2
-	mov MD1, R1
-	mov MD5, R3
+	MOV MD0, R0
+	MOV MD4, R2
+	MOV MD1, R1
+	MOV MD5, R3
 	; Execution Time
-	nop
-	nop
-	nop
-	nop
-	; Get results, because of *2 there is only one rrc to reduce to 16 bit
-	mov R4, MD0		; has to be first read
-	mov R5, MD1
-	mov R6, MD2
-	mov R7, MD3
+	NOP
+	NOP
+	NOP
+	NOP
+	; Get results, because of *2 there is only one RRC to reduce to 16 bit
+	MOV R4, MD0		; has to be first read
+	MOV R5, MD1
+	MOV R6, MD2
+	MOV R7, MD3
 	; reduce to 16 Bit with rotation
-	mov A, R7
-	rrc A
-	mov R7, A
-	mov A, R6
-	rrc A
-	mov R6, A
-	mov A, R5
-	rrc A
-	mov R5, A
-	clr C
+	MOV A, R7
+	RRC A
+	MOV R7, A
+	MOV A, R6
+	RRC A
+	MOV R6, A
+	MOV A, R5
+	RRC A
+	MOV R5, A
+	CLR C
 	; new ZnImPositiv in R6|R5
-	mov A, 0x52
-	mov 0x52, #0 	; reset 0x52
-	jnb ACC.0, NewZnRe
+	MOV A, 0x52
+	MOV 0x52, #0 	; reset 0x52
+	JNB ACC.0, NewZnRe
 	; if ZnIm should be negativ
-	mov A, R5
-	xrl A, #11111111b
-	add A, #1				; to generate overflow in carry bit
-	mov R5, A
-	mov A, R6
-	xrl A, #11111111b
-	addc A, #0
-	mov R6, A
+	MOV A, R5
+	XRL A, #11111111b
+	ADD A, #1				; to generate overflow in carry bit
+	MOV R5, A
+	MOV A, R6
+	XRL A, #11111111b
+	ADDC A, #0
+	MOV R6, A
 NewZnRe:
 	; move new ZnIm in R7|R6 to create space
-	mov A, R6
-	mov R7, A
-	mov A, R5
-	mov R6, A
+	MOV A, R6
+	MOV R7, A
+	MOV A, R5
+	MOV R6, A
 	; calc NewZnRe = ZnReSquare- ZnImSquare
 	; ZnRe and ZnIm are already positiv, so there are no problems
 	; start with ZnImSquare, result in R5|R4|R3|R2
-	mov MD0, R2
-	mov MD4, R2
-	mov MD1, R3
-	mov MD5, R3
+	MOV MD0, R2
+	MOV MD4, R2
+	MOV MD1, R3
+	MOV MD5, R3
 	; Execution Time
-	nop
-	nop
-	nop
-	nop
+	NOP
+	NOP
+	NOP
+	NOP
 	; 
-	mov R2, MD0
-	mov R3, MD1
-	mov R4, MD2
-	mov R5, MD3
+	MOV R2, MD0
+	MOV R3, MD1
+	MOV R4, MD2
+	MOV R5, MD3
 	; calc ZnReSquare
-	mov MD0, R0
-	mov MD4, R0
-	mov MD1, R1
-	mov MD5, R1
+	MOV MD0, R0
+	MOV MD4, R0
+	MOV MD1, R1
+	MOV MD5, R1
 	; Execution Time
-	nop
-	nop
-	nop
-	nop
+	NOP
+	NOP
+	NOP
+	NOP
 	; ZnReSquare-ZnImSquare
 	CLR C
-	mov A, MD0
-	subb A, R2
-	mov R0, A
-	mov A, MD1
-	subb A, R3
-	mov R1, A
-	mov A, MD2
-	subb A, R4
-	mov R2, A
-	mov A, MD3
-	subb A, R5
-	mov R3, A
+	MOV A, MD0
+	SUBB A, R2
+	MOV R0, A
+	MOV A, MD1
+	SUBB A, R3
+	MOV R1, A
+	MOV A, MD2
+	SUBB A, R4
+	MOV R2, A
+	MOV A, MD3
+	SUBB A, R5
+	MOV R3, A
 	; reduce to 16 bit
 	CLR C
-	mov A, R3
-	rrc A
-	mov R3, A
-	mov A, R2
-	rrc A
-	mov R2, A
-	mov A, R1
-	rrc A
-	mov R1, A
-	clr C
-	mov A, R3
-	rrc A
-	mov R3, A
-	mov A, R2
-	rrc A
-	mov R2, A
-	mov A, R1
-	rrc A
-	mov R1, A
-	clr C			; clean up
+	MOV A, R3
+	RRC A
+	MOV R3, A
+	MOV A, R2
+	RRC A
+	MOV R2, A
+	MOV A, R1
+	RRC A
+	MOV R1, A
+	CLR C
+	MOV A, R3
+	RRC A
+	MOV R3, A
+	MOV A, R2
+	RRC A
+	MOV R2, A
+	MOV A, R1
+	RRC A
+	MOV R1, A
+	CLR C			; clean up
 	; Structure output (at the moment ZnIm: R7|R6 and ZnRe: R2|R1)
-	mov A, R1
-	mov R0, A
-	mov A, R2
-	mov R1, A
-	mov A, R6
-	mov R2, A
-	mov A, R7
-	mov R3, A
+	MOV A, R1
+	MOV R0, A
+	MOV A, R2
+	MOV R1, A
+	MOV A, R6
+	MOV R2, A
+	MOV A, R7
+	MOV R3, A
 	RET
 
 ; input:  Zn in R0 = ZnReL
@@ -452,7 +452,7 @@ calcChar:
 	RET
 calcCharMod8:
 	MOV A, R7
-	ANL A, #111b ; value of the fourth and higher bits are devidable by 8, so they dont add up to modulo
+	ANL A, #111b ; value of the fourth and higher bits are devidable by 8, so they dont ADD up to modulo
 	MOV R7, A
 	CJNE R7, #0, calcCharMod8eq1
 	MOV R7, #164d
@@ -534,7 +534,7 @@ isFinishedNo:
 moveC:
 	MOV A, 60h
 	JZ moveCIm ; check if column number = 0
-	; add deltaC to C (Re)
+	; ADD deltaC to C (Re)
 	MOV R4, 70h
 	MOV R5, 71h
 	MOV A, 40h
@@ -564,4 +564,4 @@ moveCIm:
 finish:
 	NOP
 	
-end
+END
