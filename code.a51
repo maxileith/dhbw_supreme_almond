@@ -2,19 +2,19 @@ $NOMOD51
 #include <Reg517a.inc>
 
 ; Memory Usage:
-; 40  = DeltaC Low-Byte
-; 41  = DeltaC High-Byte
-; 42  = Number of Iterations
-; 50
-; 51
-; 53  = set if |Zn| greater than 2
-; 52  = status Bytes
-; 60  = column counter
-; 61  = row counter
-; 70  = Re(C) Low-Byte
-; 71  = Re(C) High-Byte
-; 72  = Im(C) Low-Byte
-; 73  = Im(C) High-Byte
+; 40h  = DeltaC Low-Byte
+; 41h  = DeltaC High-Byte
+; 42h  = Number of Iterations
+; 50h
+; 51h
+; 53h  = set if |Zn| greater than 2
+; 52h  = status Bytes
+; 60h  = column counter
+; 61h  = row counter
+; 70h  = Re(C) Low-Byte
+; 71h  = Re(C) High-Byte
+; 72h  = Im(C) Low-Byte
+; 73h = Im(C) High-Byte
 
 pointAReH EQU 252d ; #111111$00b
 pointAReL EQU 205d ; #11001101b
@@ -116,7 +116,7 @@ initC:
 
 calcColor:
 	; LCALL ...
-	MOV 0x42, #1
+	MOV 42h, #1
 	MOV R0, 70h
 	MOV R1, 71h
 	MOV R2, 72h
@@ -127,11 +127,11 @@ calcColorLoop:
 	JB ACC.0, endCalcColor
 	LCALL calcZnQuadrat
 	LCALL addCToZ
-	INC 0x42
-	MOV A, 0x42
+	INC 42h
+	MOV A, 42h
 	CJNE A, #NMax, calcColorLoop	
 endCalcColor:
-	MOV R7, 0x42
+	MOV R7, 42h
 	RET
 
 
@@ -143,26 +143,26 @@ endCalcColor:
 ; output: A = set if greater than 2
 checkZnAbsolutAmount:
 	; store Zn in 55-58h temporarily
-	MOV 0x55, R0
-	MOV 0x56, R1
-	MOV 0x57, R2
-	MOV 0x58, R3
+	MOV 55h, R0
+	MOV 56h, R1
+	MOV 57h, R2
+	MOV 58h, R3
 	LCALL checkZnRe
 	LCALL checkZnIm
 	LCALL calcZnAbsolutAmount
-	MOV R0, 0x55
-	MOV R1, 0x56
-	MOV R2, 0x57
-	MOV R3, 0x58
+	MOV R0, 55h
+	MOV R1, 56h
+	MOV R2, 57h
+	MOV R3, 58h
 	RET
 
 ; this function checks whether ZnRe is negativ and gets the complement
 checkZnRe:
 	; check ZnRe negativ
-	MOV 0x50, #0			; resest 0x50
+	MOV 50h, #0			; resest 0x50
 	MOV A, R1
 	JNB ACC.7, checkZnReRet
-	MOV 0x50, #1			; set 0x50 if ZnRe negativ
+	MOV 50h, #1			; set 0x50 if ZnRe negativ
 	MOV A, R0
 	XRL A, #11111111b
 	ADD A, #1				; to generate overflow in carry bit
@@ -175,10 +175,10 @@ checkZnReRet:
 	RET
 ; this function checks whether ZnIm is negativ and gets the complement
 checkZnIm:
-	MOV 0x51, #0			; reset 0x51
+	MOV 51h, #0			; reset 0x51
 	MOV A, R3
 	JNB ACC.7, checkZnImRet
-	MOV 0x51, #1			; set 0x51 if ZnIm negativ
+	MOV 51h, #1			; set 0x51 if ZnIm negativ
 	MOV A, R2
 	XRL A, #11111111b
 	ADD A, #1				; to generate overflow in carry bit
@@ -263,10 +263,10 @@ calcZnQuadrat:
  	CLR c			; safety first
 	LCALL checkZnRe
 	LCALL checkZnIm
-	MOV A, 0x50
-	ADD A, 0x51
+	MOV A, 50h
+	ADD A, 51h
 	CJNE A, #1, NewZnImPositiv
-	MOV 0x52, #1
+	MOV 52h, #1
 NewZnImPositiv:
 	; ZnRe * ZnIm * 2 = new ZnIm
 	MOV MD0, R0
@@ -295,8 +295,8 @@ NewZnImPositiv:
 	MOV R5, A
 	CLR C
 	; new ZnImPositiv in R6|R5
-	MOV A, 0x52
-	MOV 0x52, #0 	; reset 0x52
+	MOV A, 52h
+	MOV 52h, #0 	; reset 0x52
 	JNB ACC.0, NewZnRe
 	; if ZnIm should be negativ
 	MOV A, R5
