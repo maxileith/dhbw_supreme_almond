@@ -127,7 +127,6 @@ initC:
 	
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-
 calcColor:
 	; LCALL ...
 	MOV 42h, #1
@@ -147,7 +146,6 @@ calcColorLoop:
 endCalcColor:
 	MOV R7, 42h
 	RET
-
 
 ; input:  Zn in R0 = ZnReL
 ;         R1 = ZnReH
