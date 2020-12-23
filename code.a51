@@ -522,7 +522,7 @@ isFinishedNo:
 ; output: None
 moveC:
 	MOV A, 60h
-	JZ moveCIm ; check if column number = 0
+	JZ moveCIm ; check if column counter = 0
 	; ADD deltaC to C (Re)
 	MOV R4, 70h
 	MOV R5, 71h
