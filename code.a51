@@ -113,11 +113,8 @@ calcDeltaC:
 	RET
 
 ; input:  None
-; use:    output
-; output: R0 = pointAReL
-;         R1 = pointAReH
-;         R2 = pointBImL
-;         R3 = pointBImH
+; use:    None
+; output: None
 initC:
 	MOV 70h, #pointAReL
 	MOV 71h, #pointAReH
@@ -139,10 +136,11 @@ calcColor:
 calcColorLoop:
 	LCALL checkZnAbsolutAmount
 	JB ACC.0, endCalcColor
-	LCALL calcZnQuadrat
+	LCALL calcZnSquare
 	LCALL addCToZ
 	INC 0x42
 	MOV A, 0x42
+	;check if NMax got reached
 	CJNE A, #NMax, calcColorLoop	
 endCalcColor:
 	MOV R7, 0x42
@@ -272,9 +270,9 @@ greaterThan2:
 ;         R1 = ZnReH
 ;         R2 = ZnImL
 ;         R3 = ZnImH
-calcZnQuadrat:
+calcZnSquare:
 	; calc ZnIm
- 	CLR c			; safety first
+ 	CLR C			; safety first
 	LCALL checkZnRe
 	LCALL checkZnIm
 	MOV A, 0x50
