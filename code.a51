@@ -472,7 +472,6 @@ calcCharMod8eq7:
 
 ; input:  R7 = char
 ; use:    A = check TI and save column number
-;         DPTR = column counter address
 ; output: None
 output:
 output_wait:
