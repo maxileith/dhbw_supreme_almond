@@ -42,8 +42,8 @@ pointBImL EQU 0d   ; #00000000b
 ;pointBImH EQU 4d   ; #000001$00b
 ;pointBImL EQU 0d   ; #00000000b
 
-PX EQU 20d
-NMax EQU 20d
+PX EQU 111d
+NMax EQU 60d
 	
 ORG 00h
 	LJMP program	; jump to start of program
@@ -75,7 +75,7 @@ initSerialInterface:
 	; SM0 = 0
 	; SM1 = 1
 	; S0CON --> 01000000b for Mode 1
-	MOV S0CON, #01000000b ;
+	MOV S0CON, #01000010b ;
 	; BD (Baudrate generator enabled) = 1
 	; ADCON0 --> 10000000b
 	MOV ADCON0, #10000000b
@@ -475,15 +475,16 @@ calcCharMod8eq7:
 ;         DPTR = column counter address
 ; output: None
 output:
-	; output of R7 via COM 0
-	MOV S0BUF, R7
 output_wait:
 	; check if sent
 	MOV A, S0CON
 	JNB ACC.1, output_wait
 output_finished:
 	ANL S0CON, #0FDh
+	; output of R7 via COM 0
+	MOV S0BUF, R7
 	RET
+
 	
 ; input:  None
 ; use:    None
