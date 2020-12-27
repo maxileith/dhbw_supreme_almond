@@ -233,7 +233,7 @@ calcZnAbsolutAmount:
 	NOP
 	NOP
 	NOP
-	;check amount
+	; add ZnReSquare to ZnImSquare
 	MOV A, MD0
 	ADD A, R2
 	MOV R2, A
